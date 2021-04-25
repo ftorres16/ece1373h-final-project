@@ -40,18 +40,21 @@ void cnn_layer(float *mem,        // global memory pointer
               // Input X Dimension
               for (int i_x = o_x * s, iix = 0; i_x < o_x * s + k;
                    i_x++, iix++) {
-                output_element +=
-                    mem[input_offset / sizeof(float) + num_weights +
-                        num_biases + b_ * id * ix * iy + i_d * ix * iy +
-                        i_y * ix + i_x] *
-                    mem[input_offset / sizeof(float) + o_d * id * k * k +
-                        i_d * k * k + iiy * k + iix];
+                int k_i_addr = input_offset / sizeof(float) + o_d * id * k * k +
+                               i_d * k * k + iiy * k + iix;
+                int in_addr = input_offset / sizeof(float) + num_weights +
+                              num_biases + b_ * id * ix * iy + i_d * ix * iy +
+                              i_y * ix + i_x;
+
+                output_element += mem[in_addr] * mem[k_i_addr];
               }
             }
           }
+
+          int out_addr = output_offset / sizeof(float) + b_ * od * ox * oy +
+                         o_d * ox * oy + o_y * ox + o_x;
           // Write output
-          mem[output_offset / sizeof(float) + b_ * od * ox * oy +
-              o_d * ox * oy + o_y * ox + o_x] = std::max(0.0f, output_element);
+          mem[out_addr] = std::max(0.0f, output_element);
         }
       }
     }
