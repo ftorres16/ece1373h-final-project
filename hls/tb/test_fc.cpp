@@ -1,6 +1,5 @@
 #include "../src/fc.h"
 #include "utils.h"
-#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -28,7 +27,7 @@ int main() {
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem, src_file)) {
+  if (!load_txt(mem_gold, src_file)) {
     cout << "Could not load mem :(";
     return -1;
   }
@@ -40,7 +39,7 @@ int main() {
   fc_layer(mem, input_offset, output_offset, b, ox, oy, ix, iy);
 
   for (int i = 0; i < mem_len; i++) {
-    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i] * 0.1)) {
+    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
       cout << "ERROR when comparing mem[" << i << "]. Expected: " << mem_gold[i]
            << " Got: " << mem[i] << endl;
       passed = false;
@@ -51,5 +50,5 @@ int main() {
     return -1;
   }
 
-  cout << "Fully Connected test successful.\n";
+  cout << "Fully Connected test successful." << endl;
 }
