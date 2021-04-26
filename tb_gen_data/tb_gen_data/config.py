@@ -4,7 +4,7 @@ IN_D = 3
 IN_Y = 2
 IN_X = 2
 
-KERNEL_SIZE = 3
+KERNEL_SIZE = 2
 STRIDE = 1
 
 OUT_D = 4

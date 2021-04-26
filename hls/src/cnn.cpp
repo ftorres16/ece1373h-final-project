@@ -53,8 +53,10 @@ void cnn_layer(float *mem,        // global memory pointer
 
           int out_addr = output_offset / sizeof(float) + b_ * od * ox * oy +
                          o_d * ox * oy + o_y * ox + o_x;
+
           // Write output
-          mem[out_addr] = std::max(0.0f, output_element);
+          // mem[out_addr] = std::max(0.0f, output_element);
+          mem[out_addr] = output_element;
         }
       }
     }

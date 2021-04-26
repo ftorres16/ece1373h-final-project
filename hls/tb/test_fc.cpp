@@ -46,9 +46,10 @@ int main() {
     }
   }
 
-  if (!passed) {
+  if (passed) {
+    cout << "Fully Connected test successful :)" << endl;
+  } else {
+    cout << "Fully Connected test failed :(" << endl;
     return -1;
   }
-
-  cout << "Fully Connected test successful." << endl;
 }
