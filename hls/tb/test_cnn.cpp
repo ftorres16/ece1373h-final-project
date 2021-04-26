@@ -1,5 +1,6 @@
 #include "../src/cnn.h"
 #include "utils.h"
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -14,10 +15,11 @@ int main() {
   int ix = 2;
   int iy = 2;
   int od = 4;
-  int ox = 1;
-  int oy = 1;
   int s = 1;
   int k = 2;
+
+  int ox = floor((ix - k) / s);
+  int oy = floor((iy - k) / s);
 
   int num_weights = od * k * k * id;
   int num_bias = od;
