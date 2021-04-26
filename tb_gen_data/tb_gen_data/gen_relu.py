@@ -2,21 +2,35 @@ import torch
 import torch.nn as nn
 
 from config import BATCH_SIZE, IN_X, IN_Y, OUTPUT_FOLDER
+from tb_gen_data.gen_base import GenBase
 
 
-def create_random_data(out_file: str):
-    relu = nn.ReLU()
+class GenReLU(GenBase):
+    def __init__(self, out_file: str):
+        super().__init__(out_file)
 
-    input_ = torch.randn(BATCH_SIZE, IN_X, IN_Y)
-    output = relu(input_)
+        self.relu = nn.ReLU()
 
-    with open(out_file, "w") as f:
-        in_str = [f"{in_px}\n" for in_px in torch.flatten(input_).tolist()]
-        f.writelines(in_str)
+    def gen_input(self):
+        self.input_ = torch.randn(BATCH_SIZE, IN_X, IN_Y)
 
-        out_str = [f"{out_px}\n" for out_px in torch.flatten(output).tolist()]
-        f.writelines(out_str)
+    def gen_output(self):
+        self.output = self.relu(self.input_)
+
+    def write_output(self):
+        with open(self.out_file, "w") as f:
+            in_str = [f"{in_px}\n" for in_px in torch.flatten(self.input_).tolist()]
+            f.writelines(in_str)
+
+            out_str = [f"{out_px}\n" for out_px in torch.flatten(self.output).tolist()]
+            f.writelines(out_str)
 
 
 if __name__ == "__main__":
-    create_random_data(f"{OUTPUT_FOLDER}/relu.txt")
+    torch.manual_seed(0)
+
+    gen = GenReLU(f"{OUTPUT_FOLDER}/relu.txt")
+
+    gen.gen_input()
+    gen.gen_output()
+    gen.write_output()
