@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from config import BATCH_SIZE, IN_X, IN_Y, OUT_Y, OUTPUT_FOLDER
+from config import BATCH_SIZE, IN_X, IN_Y, OUT_X, OUTPUT_FOLDER
 from tb_gen_data.gen_base import GenBase
 
 
@@ -9,10 +9,10 @@ class GenFC(GenBase):
     def __init__(self, out_file: str):
         super().__init__(out_file)
 
-        self.fc = nn.Linear(IN_Y, OUT_Y)
+        self.fc = nn.Linear(IN_X, OUT_X)
 
     def gen_input(self):
-        self.input_ = torch.randn(BATCH_SIZE, IN_X, IN_Y)
+        self.input_ = torch.randn(BATCH_SIZE, IN_Y, IN_X)
 
     def gen_output(self):
         self.output = self.fc(self.input_)
