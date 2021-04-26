@@ -8,6 +8,7 @@ using namespace std;
 
 int main() {
   string src_file = "tb_data/fc.txt";
+  bool passed = true;
 
   int b = 2;
   int ix = 2;
@@ -36,17 +37,8 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  for (int i = 0; i < mem_len - num_outputs; i++) {
-    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i] * 0.1)) {
-      cout << "ERROR when copying mem[" << i << "]. Expected: " << mem_gold[i]
-           << " Got: " << mem[i] << endl;
-      return -1;
-    }
-  }
-
   fc_layer(mem, input_offset, output_offset, b, ox, oy, ix, iy);
 
-  bool passed = true;
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i] * 0.1)) {
       cout << "ERROR when comparing mem[" << i << "]. Expected: " << mem_gold[i]
