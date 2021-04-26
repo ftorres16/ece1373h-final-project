@@ -1,0 +1,13 @@
+BATCH_SIZE = 2
+
+IN_D = 3
+IN_Y = 8
+IN_X = 8
+
+KERNEL_SIZE = 3
+STRIDE = 1
+
+OUT_D = 4
+OUT_Y = 4
+
+OUTPUT_FOLDER = "outputs"
