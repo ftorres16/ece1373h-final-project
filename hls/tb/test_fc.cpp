@@ -1,29 +1,14 @@
 #include "../src/fc.h"
+#include "utils.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-bool load_txt(float *mem) {
-  int i = 0;
-  string line;
-  ifstream my_file("tb_data/fc.txt");
-
-  if (my_file.is_open()) {
-    while (getline(my_file, line)) {
-      mem[i] = stof(line);
-      i++;
-    }
-  } else {
-    cout << "Unable to open file" << endl;
-    return false;
-  }
-
-  return true;
-}
-
 int main() {
+  string src_file = "tb_data/fc.txt";
+
   int b = 2;
   int ix = 2;
   int iy = 2;
@@ -42,7 +27,7 @@ int main() {
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold)) {
+  if (!load_txt(mem, src_file)) {
     cout << "Could not load mem :(";
     return -1;
   }
