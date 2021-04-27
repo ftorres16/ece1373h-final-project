@@ -22,6 +22,12 @@ int main() {
   int s = params.at("s");
   int k = params.at("k");
 
+  // basic parameter validation
+  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || s <= 0 || k <= 0) {
+    cout << "Invalid MaxPool2D params :(" << endl;
+    return -1;
+  }
+
   int od = id;
   int ox = floor((ix - k) / s + 1);
   int oy = floor((iy - k) / s + 1);

@@ -19,6 +19,12 @@ int main() {
   int ix = params.at("ix");
   int iy = params.at("iy");
 
+  // basic parameter validation
+  if (b <= 0 || ix <= 0 || iy <= 0) {
+    cout << "Invalid ReLU params :(" << endl;
+    return -1;
+  }
+
   int num_inputs = b * iy * ix;
   int num_outputs = b * ix * iy;
 
