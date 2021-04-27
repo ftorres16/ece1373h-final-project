@@ -6,39 +6,51 @@ from tb_gen_data.gen_base import GenBase
 
 
 class GenFC(GenBase):
-    def __init__(self, out_file: str):
-        super().__init__(out_file)
+    def __init__(
+        self,
+        name: str,
+        out_folder: str = OUTPUT_FOLDER,
+        in_x: int = IN_X,
+        out_x: int = OUT_X,
+    ):
+        super().__init__(name, out_folder)
 
-        self.fc = nn.Linear(IN_X, OUT_X)
+        self.fc = nn.Linear(in_x, out_x)
 
-    def gen_input(self):
-        self.input_ = torch.randn(BATCH_SIZE, IN_Y, IN_X)
+    def gen_input(
+        self, batch_size: int = BATCH_SIZE, in_y: int = IN_Y, in_x: int = IN_X
+    ):
+        self.input_ = torch.randn(batch_size, in_y, in_x)
 
     def gen_output(self):
         self.output = self.fc(self.input_)
 
-    def write_output(self):
-        with open(self.out_file, "w") as f:
-            weights = [
-                f"{weight}\n" for weight in torch.flatten(self.fc.weight).tolist()
-            ]
-            f.writelines(weights)
+    def _gen_mem(self):
+        flat_tensors = [
+            torch.flatten(self.fc.weight),
+            self.fc.bias,
+            torch.flatten(self.input_),
+            torch.flatten(self.output),
+        ]
 
-            biases = [f"{bias}\n" for bias in self.fc.bias.tolist()]
-            f.writelines(biases)
+        self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
-            in_str = [f"{in_px}\n" for in_px in torch.flatten(self.input_).tolist()]
-            f.writelines(in_str)
-
-            out_str = [f"{out_px}\n" for out_px in torch.flatten(self.output).tolist()]
-            f.writelines(out_str)
+    def _gen_params(self):
+        self.params = {
+            "b": self.input_.shape[0],
+            "ix": self.input_.shape[2],
+            "iy": self.input_.shape[1],
+            "ox": self.output.shape[2],
+            "oy": self.output.shape[1],
+        }
 
 
 if __name__ == "__main__":
     torch.manual_seed(0)
 
-    gen = GenFC(f"{OUTPUT_FOLDER}/fc.txt")
+    gen = GenFC("fc")
 
     gen.gen_input()
     gen.gen_output()
-    gen.write_output()
+    gen.write_mem()
+    gen.write_params()
