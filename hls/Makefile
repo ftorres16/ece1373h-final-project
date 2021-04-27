@@ -12,8 +12,10 @@ relu: tb/test_relu.cpp tb/utils.cpp tb/utils.h src/relu.cpp src/relu.h
 max_pool_2d: tb/test_max_pool_2d.cpp tb/utils.cpp tb/utils.h src/max_pool_2d.cpp src/max_pool_2d.h
 	$(CXX) $(CFLAGS) tb/test_max_pool_2d.cpp tb/utils.h tb/utils.cpp src/max_pool_2d.cpp src/max_pool_2d.h $(LDFLAGS) -o $(OUT_FOLDER)/$@
 
+batch_norm_2d: tb/test_batch_norm_2d.cpp tb/utils.cpp tb/utils.h src/batch_norm_2d.cpp src/batch_norm_2d.h
+	$(CXX) $(CFLAGS) tb/test_batch_norm_2d.cpp tb/utils.h tb/utils.cpp src/batch_norm_2d.cpp src/batch_norm_2d.h $(LDFLAGS) -o $(OUT_FOLDER)/$@
 
-all: cnn fc relu max_pool_2d
+all: cnn fc relu max_pool_2d batch_norm_2d
 
 clean:
 	rm $(OUT_FOLDER)/*
