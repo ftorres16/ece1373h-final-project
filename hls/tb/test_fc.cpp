@@ -1,19 +1,30 @@
 #include "../src/fc.h"
 #include "utils.h"
 #include <iostream>
+#include <map>
 #include <string>
 
 using namespace std;
 
 int main() {
-  string src_file = "tb_data/fc.txt";
   bool passed = true;
 
-  int b = 2;
-  int ix = 2;
-  int iy = 2;
-  int ox = 2;
-  int oy = iy;
+  string src_file = "tb_data/fc.txt";
+  string src_params = "tb_data/fc_params.txt";
+
+  map<string, int> params = read_params(src_params);
+
+  int b = params.at("b");
+  int ix = params.at("ix");
+  int iy = params.at("iy");
+  int ox = params.at("ox");
+  int oy = params.at("oy");
+
+  // basic parameter validation
+  if (b <= 0 || ix <= 0 || iy <= 0 || ox <= 0 || oy <= 0) {
+    cout << "Invalid FC params :(" << endl;
+    return -1;
+  }
 
   int num_weights = ix * ox;
   int num_bias = ox;
@@ -24,11 +35,12 @@ int main() {
   int output_offset = input_offset + num_inputs * sizeof(float);
 
   int mem_len = num_weights + num_bias + num_inputs + num_outputs;
+
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold, src_file)) {
-    cout << "Could not load mem :(";
+  if (!load_txt(mem_gold, src_file, mem_len)) {
+    cout << "Could not load mem :(" << endl;
     return -1;
   }
 

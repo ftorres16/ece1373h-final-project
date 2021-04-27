@@ -5,13 +5,14 @@ from tb_gen_data.config import BATCH_SIZE, KERNEL_SIZE, IN_D, IN_Y, IN_X, OUTPUT
 from tb_gen_data.gen_base import GenBase
 
 
-class GenMaxPool(GenBase):
+class GenMaxPool2D(GenBase):
     def __init__(
         self,
-        out_file: str,
+        name: str,
+        out_folder: str = OUTPUT_FOLDER,
         kernel_size: int = KERNEL_SIZE,
     ):
-        super().__init__(out_file)
+        super().__init__(name, out_folder)
 
         self.max_pool = nn.MaxPool2d(kernel_size)
 
@@ -27,20 +28,31 @@ class GenMaxPool(GenBase):
     def gen_output(self):
         self.output = self.max_pool(self.input_)
 
-    def write_output(self):
-        with open(self.out_file, "w") as f:
-            in_str = [f"{in_px}\n" for in_px in torch.flatten(self.input_).tolist()]
-            f.writelines(in_str)
+    def _gen_mem(self):
+        flat_tensors = [
+            torch.flatten(self.input_),
+            torch.flatten(self.output),
+        ]
+        self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
-            out_str = [f"{out_px}\n" for out_px in torch.flatten(self.output).tolist()]
-            f.writelines(out_str)
+    def _gen_params(self):
+        self.params = {
+            "b": self.input_.shape[0],
+            "id": self.input_.shape[1],
+            "ix": self.input_.shape[3],
+            "iy": self.input_.shape[2],
+            "k": self.max_pool.kernel_size,
+            "s": self.max_pool.stride,
+            "od": self.output.shape[1],
+        }
 
 
 if __name__ == "__main__":
     torch.manual_seed(0)
 
-    gen = GenMaxPool(f"{OUTPUT_FOLDER}/max_pool_2d.txt")
+    gen = GenMaxPool2D("max_pool_2d")
 
     gen.gen_input()
     gen.gen_output()
-    gen.write_output()
+    gen.write_mem()
+    gen.write_params()

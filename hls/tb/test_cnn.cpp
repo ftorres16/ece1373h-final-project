@@ -2,24 +2,35 @@
 #include "utils.h"
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <string>
 
 using namespace std;
 
 int main() {
-  string src_file = "tb_data/cnn.txt";
   bool passed = true;
 
-  int b = 2;
-  int id = 3;
-  int ix = 2;
-  int iy = 2;
-  int od = 4;
-  int s = 1;
-  int k = 2;
+  string src_file = "tb_data/cnn.txt";
+  string src_params = "tb_data/cnn_params.txt";
 
-  int ox = floor((ix - k) / s);
-  int oy = floor((iy - k) / s);
+  map<string, int> params = read_params(src_params);
+
+  int b = params.at("b");
+  int id = params.at("id");
+  int ix = params.at("ix");
+  int iy = params.at("iy");
+  int od = params.at("od");
+  int s = params.at("s");
+  int k = params.at("k");
+
+  // basic parameter validation
+  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0) {
+    cout << "Invalid CNN params :(" << endl;
+    return -1;
+  }
+
+  int ox = floor((ix - k) / s + 1);
+  int oy = floor((iy - k) / s + 1);
 
   int num_weights = od * k * k * id;
   int num_bias = od;
@@ -31,11 +42,12 @@ int main() {
       input_offset + (num_weights + num_bias + num_inputs) * sizeof(float);
 
   int mem_len = num_weights + num_bias + num_inputs + num_outputs;
+
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold, src_file)) {
-    cout << "Could not load mem :(";
+  if (!load_txt(mem_gold, src_file, mem_len)) {
+    cout << "Could not load mem :(" << endl;
     return -1;
   }
 

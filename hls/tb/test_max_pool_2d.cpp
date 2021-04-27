@@ -2,20 +2,31 @@
 #include "utils.h"
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <string>
 
 using namespace std;
 
 int main() {
-  string src_file = "tb_data/max_pool_2d.txt";
   bool passed = true;
 
-  int b = 2;
-  int id = 3;
-  int ix = 2;
-  int iy = 2;
-  int k = 2;
-  int s = 2;
+  string src_file = "tb_data/max_pool_2d.txt";
+  string src_params = "tb_data/max_pool_2d_params.txt";
+
+  map<string, int> params = read_params(src_params);
+
+  int b = params.at("b");
+  int id = params.at("id");
+  int ix = params.at("ix");
+  int iy = params.at("iy");
+  int s = params.at("s");
+  int k = params.at("k");
+
+  // basic parameter validation
+  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || s <= 0 || k <= 0) {
+    cout << "Invalid MaxPool2D params :(" << endl;
+    return -1;
+  }
 
   int od = id;
   int ox = floor((ix - k) / s + 1);
@@ -31,7 +42,7 @@ int main() {
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold, src_file)) {
+  if (!load_txt(mem_gold, src_file, mem_len)) {
     cout << "Could not load mem :(";
     return -1;
   }
