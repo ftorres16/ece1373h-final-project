@@ -2,17 +2,22 @@
 #include "utils.h"
 #include <cmath>
 #include <iostream>
+#include <map>
 #include <string>
 
 using namespace std;
 
 int main() {
-  string src_file = "tb_data/relu.txt";
   bool success = true;
 
-  int b = 2;
-  int ix = 2;
-  int iy = 2;
+  string src_file = "tb_data/relu.txt";
+  string src_params = "tb_data/relu_params.txt";
+
+  map<string, int> params = read_params(src_params);
+
+  int b = params.at("b");
+  int ix = params.at("ix");
+  int iy = params.at("iy");
 
   int num_inputs = b * iy * ix;
   int num_outputs = b * ix * iy;
@@ -21,10 +26,11 @@ int main() {
   int output_offset = input_offset + num_inputs * sizeof(float);
 
   int mem_len = num_inputs + num_outputs;
+
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold, src_file)) {
+  if (!load_txt(mem_gold, src_file, mem_len)) {
     cout << "Could not load mem :(";
     return -1;
   }
