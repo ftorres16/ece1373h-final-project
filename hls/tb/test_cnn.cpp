@@ -37,9 +37,9 @@ int main() {
   int num_inputs = b * id * ix * iy;
   int num_outputs = b * od * ox * oy;
 
-  int input_offset = 0 * sizeof(float);
-  int output_offset =
-      input_offset + (num_weights + num_bias + num_inputs) * sizeof(float);
+  int params_offset = 0 * sizeof(float);
+  int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
+  int output_offset = input_offset + num_inputs * sizeof(float);
 
   int mem_len = num_weights + num_bias + num_inputs + num_outputs;
 
@@ -55,7 +55,8 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  cnn_layer(mem, input_offset, output_offset, b, od, ox, oy, id, ix, iy, s, k);
+  cnn_layer(mem, params_offset, input_offset, output_offset, b, od, ox, oy, id,
+            ix, iy, s, k);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {

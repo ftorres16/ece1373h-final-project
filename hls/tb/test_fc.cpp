@@ -31,7 +31,8 @@ int main() {
   int num_inputs = b * iy * ix;
   int num_outputs = b * ox * oy;
 
-  int input_offset = (num_weights + num_bias) * sizeof(float);
+  int params_offset = 0 * sizeof(float);
+  int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
   int output_offset = input_offset + num_inputs * sizeof(float);
 
   int mem_len = num_weights + num_bias + num_inputs + num_outputs;
@@ -48,7 +49,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  fc_layer(mem, input_offset, output_offset, b, ox, oy, ix, iy);
+  fc_layer(mem, params_offset, input_offset, output_offset, b, ox, oy, ix, iy);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {

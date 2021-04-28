@@ -1,22 +1,22 @@
 #include "cnn.h"
 #include <algorithm>
 
-void cnn_layer(float *mem,        // global memory pointer
-               int input_offset,  // offset of inputs
-               int output_offset, // offset of outputs
-               const int b,       // batch size
-               const int od,      // output dimensions
-               const int ox,      // output width
-               const int oy,      // output height
-               const int id,      // input dimensions
-               const int ix,      // input width
-               const int iy,      // input height
-               const int s,       // stride
-               const int k)       // kernel size
+void cnn_layer(float *mem,              // global memory pointer
+               const int params_offset, // ofset of parameters
+               const int input_offset,  // offset of inputs
+               const int output_offset, // offset of outputs
+               const int b,             // batch size
+               const int od,            // output dimensions
+               const int ox,            // output width
+               const int oy,            // output height
+               const int id,            // input dimensions
+               const int ix,            // input width
+               const int iy,            // input height
+               const int s,             // stride
+               const int k)             // kernel size
 {
 
   int num_weights = id * od * k * k;
-  int num_biases = od;
   // int num_input = b * id * ix * iy;
 
   // Batch
@@ -29,7 +29,7 @@ void cnn_layer(float *mem,        // global memory pointer
         for (int o_x = 0; o_x < ox; o_x++) {
           // Set bias
           float output_element =
-              mem[input_offset / sizeof(float) + num_weights + o_d];
+              mem[params_offset / sizeof(float) + num_weights + o_d];
 
           // Weighted Sum:
 
@@ -40,11 +40,10 @@ void cnn_layer(float *mem,        // global memory pointer
               // Input X Dimension
               for (int i_x = o_x * s, iix = 0; i_x < o_x * s + k;
                    i_x++, iix++) {
-                int k_i_addr = input_offset / sizeof(float) + o_d * id * k * k +
-                               i_d * k * k + iiy * k + iix;
-                int in_addr = input_offset / sizeof(float) + num_weights +
-                              num_biases + b_ * id * ix * iy + i_d * ix * iy +
-                              i_y * ix + i_x;
+                int k_i_addr = params_offset / sizeof(float) +
+                               o_d * id * k * k + i_d * k * k + iiy * k + iix;
+                int in_addr = input_offset / sizeof(float) + b_ * id * ix * iy +
+                              i_d * ix * iy + i_y * ix + i_x;
 
                 output_element += mem[in_addr] * mem[k_i_addr];
               }

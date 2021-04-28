@@ -1,6 +1,7 @@
 #include <algorithm>
 
-void fc_layer(float *mem, int input_offset, int output_offset,
+void fc_layer(float *mem, const int params_offset, const int input_offset,
+              const int output_offset,
               const int b,  // batch size
               const int ox, // output width
               const int oy, // output height
@@ -17,7 +18,7 @@ void fc_layer(float *mem, int input_offset, int output_offset,
       // Output X dimension
       for (int o_x = 0; o_x < ox; o_x++) {
         // bias
-        int b_addr = num_weights + o_x;
+        int b_addr = params_offset / sizeof(float) + num_weights + o_x;
 
         float output_element = mem[b_addr];
 
@@ -25,7 +26,7 @@ void fc_layer(float *mem, int input_offset, int output_offset,
           // output_element += x_ij * m_ij
           int x_ij_addr =
               input_offset / sizeof(float) + b_ * iy * ix + o_y * ix + i_x;
-          int m_ij_addr = i_x + o_x * oy;
+          int m_ij_addr = params_offset / sizeof(float) + i_x + o_x * oy;
 
           output_element += mem[x_ij_addr] * mem[m_ij_addr];
         }

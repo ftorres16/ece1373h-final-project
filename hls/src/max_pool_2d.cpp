@@ -2,9 +2,9 @@
 #include <iostream>
 
 void max_pool_2d(float *mem, // global memory pointer
-                 int input_offset, int output_offset, const int b, const int od,
-                 const int ox, const int oy, const int id, const int ix,
-                 const int iy, const int s, const int k) {
+                 const int input_offset, const int output_offset, const int b,
+                 const int od, const int ox, const int oy, const int id,
+                 const int ix, const int iy, const int s, const int k) {
 
   for (int b_ = 0; b_ < b; b_++) {
     for (int o_d = 0; o_d < id; o_d++) {
