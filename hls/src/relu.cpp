@@ -1,6 +1,6 @@
 #include <algorithm>
 
-void relu_layer(float *mem, int input_offset, int output_offset,
+void relu_layer(float *mem, const int input_offset, const int output_offset,
                 const int num_entries) {
   for (int i = 0; i < num_entries; i++) {
     int in_addr = input_offset / sizeof(float) + i;
