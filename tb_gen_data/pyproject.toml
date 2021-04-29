@@ -7,6 +7,7 @@ authors = ["Fabian Torres <36959980+ftorres16@users.noreply.github>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 torch = "^1.8.1"
+onnx2pytorch = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
