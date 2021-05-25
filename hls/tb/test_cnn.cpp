@@ -56,7 +56,7 @@ int main() {
   }
 
   cnn_layer(mem, params_offset, input_offset, output_offset, b, od, ox, oy, id,
-            ix, iy, s, k);
+            ix, iy, s, k, k);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {

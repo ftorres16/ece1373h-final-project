@@ -13,10 +13,11 @@ void cnn_layer(float *mem,              // global memory pointer
                const int ix,            // input width
                const int iy,            // input height
                const int s,             // stride
-               const int k)             // kernel size
+               const int kx,            // kernel size x
+               const int ky)            // kernel size y
 {
 
-  int num_weights = id * od * k * k;
+  int num_weights = id * od * kx * ky;
   // int num_input = b * id * ix * iy;
 
   // Batch
@@ -36,12 +37,13 @@ void cnn_layer(float *mem,              // global memory pointer
           // Input Dimensions (Feature Maps)
           for (int i_d = 0; i_d < id; i_d++) {
             // Input Y Dimension
-            for (int i_y = o_y * s, iiy = 0; i_y < o_y * s + k; i_y++, iiy++) {
+            for (int i_y = o_y * s, iiy = 0; i_y < o_y * s + ky; i_y++, iiy++) {
               // Input X Dimension
-              for (int i_x = o_x * s, iix = 0; i_x < o_x * s + k;
+              for (int i_x = o_x * s, iix = 0; i_x < o_x * s + kx;
                    i_x++, iix++) {
                 int k_i_addr = params_offset / sizeof(float) +
-                               o_d * id * k * k + i_d * k * k + iiy * k + iix;
+                               o_d * id * kx * ky + i_d * kx * ky + iiy * kx +
+                               iix;
                 int in_addr = input_offset / sizeof(float) + b_ * id * ix * iy +
                               i_d * ix * iy + i_y * ix + i_x;
 
