@@ -25,7 +25,7 @@ bool load_txt(float *mem, const string fname, const int mem_len) {
       }
     }
   } else {
-    cout << "Unable to open file" << endl;
+    cout << "Unable to open file " << fname << endl;
     success = false;
   }
 
@@ -39,9 +39,13 @@ map<string, int> read_params(const string fname) {
   string key, val;
   ifstream my_file(fname, ios::in);
 
-  while (my_file >> key) {
-    my_file >> val;
-    params[key] = stoi(val);
+  if (my_file.is_open()) {
+    while (my_file >> key) {
+      my_file >> val;
+      params[key] = stoi(val);
+    }
+  } else {
+    cout << "Unable to open file " << fname << endl;
   }
 
   my_file.close();
