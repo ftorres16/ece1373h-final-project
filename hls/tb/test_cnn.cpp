@@ -13,32 +13,35 @@ int main() {
   string src_file = "tb_data/cnn.txt";
   string src_params = "tb_data/cnn_params.txt";
 
-  map<string, int> params = read_params(src_params);
+  CONV_LAYER_PARAMS params;
+  map<string, int> f_params = read_params(src_params);
 
-  int b = params.at("b");
-  int id = params.at("id");
-  int ix = params.at("ix");
-  int iy = params.at("iy");
-  int od = params.at("od");
-  int s = params.at("s");
-  int k = params.at("k");
-  int px = params.at("px");
-  int py = params.at("py");
+  params.b = f_params.at("b");
+  params.id = f_params.at("id");
+  params.ix = f_params.at("ix");
+  params.iy = f_params.at("iy");
+  params.od = f_params.at("od");
+  params.s = f_params.at("s");
+  params.kx = f_params.at("k");
+  params.ky = f_params.at("k");
+  params.px = f_params.at("px");
+  params.py = f_params.at("py");
+
+  params.ox = floor((params.ix + 2 * params.px - params.kx) / params.s + 1);
+  params.oy = floor((params.iy + 2 * params.py - params.ky) / params.s + 1);
 
   // basic parameter validation
-  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0 ||
-      px < 0 || py < 0) {
+  if (params.b <= 0 || params.id <= 0 || params.ix <= 0 || params.iy <= 0 ||
+      params.od <= 0 || params.ox <= 0 || params.oy <= 0 || params.s <= 0 ||
+      params.kx <= 0 || params.ky <= 0 || params.px < 0 || params.py < 0) {
     cout << "Invalid CNN params :(" << endl;
     return -1;
   }
 
-  int ox = floor((ix + 2 * px - k) / s + 1);
-  int oy = floor((iy + 2 * py - k) / s + 1);
-
-  int num_weights = od * k * k * id;
-  int num_bias = od;
-  int num_inputs = b * id * ix * iy;
-  int num_outputs = b * od * ox * oy;
+  int num_weights = params.od * params.kx * params.ky * params.id;
+  int num_bias = params.od;
+  int num_inputs = params.b * params.id * params.ix * params.iy;
+  int num_outputs = params.b * params.od * params.ox * params.oy;
 
   int params_offset = 0 * sizeof(float);
   int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
@@ -58,8 +61,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  cnn_layer(mem, params_offset, input_offset, output_offset, b, od, ox, oy, id,
-            ix, iy, s, k, k, px, py);
+  cnn_layer(mem, params_offset, input_offset, output_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
