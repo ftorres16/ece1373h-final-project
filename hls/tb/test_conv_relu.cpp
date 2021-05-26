@@ -33,8 +33,8 @@ int main() {
     return -1;
   }
 
-  int ox = floor((ix - k) / s + 1);
-  int oy = floor((iy - k) / s + 1);
+  int ox = floor((ix + 2 * px - k) / s + 1);
+  int oy = floor((iy + 2 * py - k) / s + 1);
 
   int num_weights = od * k * k * id;
   int num_bias = od;
