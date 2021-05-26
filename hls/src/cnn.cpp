@@ -14,7 +14,9 @@ void cnn_layer(float *mem,              // global memory pointer
                const int iy,            // input height
                const int s,             // stride
                const int kx,            // kernel size x
-               const int ky)            // kernel size y
+               const int ky,            // kernel size y
+               const int px,            // padding x
+               const int py)            // padding y
 {
 
   int num_weights = id * od * kx * ky;
@@ -37,9 +39,10 @@ void cnn_layer(float *mem,              // global memory pointer
           // Input Dimensions (Feature Maps)
           for (int i_d = 0; i_d < id; i_d++) {
             // Input Y Dimension
-            for (int i_y = o_y * s, iiy = 0; i_y < o_y * s + ky; i_y++, iiy++) {
+            for (int i_y = o_y * s - py, iiy = 0; i_y < o_y * s - py + ky;
+                 i_y++, iiy++) {
               // Input X Dimension
-              for (int i_x = o_x * s, iix = 0; i_x < o_x * s + kx;
+              for (int i_x = o_x * s - px, iix = 0; i_x < o_x * s - px + kx;
                    i_x++, iix++) {
                 int k_i_addr = params_offset / sizeof(float) +
                                o_d * id * kx * ky + i_d * kx * ky + iiy * kx +
@@ -47,7 +50,12 @@ void cnn_layer(float *mem,              // global memory pointer
                 int in_addr = input_offset / sizeof(float) + b_ * id * ix * iy +
                               i_d * ix * iy + i_y * ix + i_x;
 
-                output_element += mem[in_addr] * mem[k_i_addr];
+                // accomodate for padding
+                float in_val = (i_x >= 0 && i_x < ix) && (i_y >= 0 && i_y < iy)
+                                   ? mem[in_addr]
+                                   : 0;
+
+                output_element += in_val * mem[k_i_addr];
               }
             }
           }

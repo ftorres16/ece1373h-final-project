@@ -11,5 +11,7 @@ void cnn_layer(float *mem,              // global memory pointer
                const int iy,            // input height
                const int s,             // stride
                const int kx,            // kernel size x
-               const int ky)            // kernel size y
+               const int ky,            // kernel size y
+               const int px,            // padding size x
+               const int py)            // padding size y
     ;

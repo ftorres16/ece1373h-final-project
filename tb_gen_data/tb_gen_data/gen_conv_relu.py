@@ -47,6 +47,8 @@ class GenConvRelu(GenBase):
             "od": self.model.conv.weight.shape[0],
             "s": self.model.conv.stride[0],
             "k": self.model.conv.weight.shape[2],
+            "px": self.model.conv.padding[1],
+            "py": self.model.conv.padding[0],
         }
 
 

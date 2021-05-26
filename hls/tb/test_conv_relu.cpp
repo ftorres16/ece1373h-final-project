@@ -23,9 +23,12 @@ int main() {
   int od = params.at("od");
   int s = params.at("s");
   int k = params.at("k");
+  int px = params.at("px");
+  int py = params.at("py");
 
   // basic parameter validation
-  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0) {
+  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0 ||
+      px < 0 || py < 0) {
     cout << "Invalid Conv params :(" << endl;
     return -1;
   }
@@ -58,7 +61,7 @@ int main() {
   }
 
   cnn_layer(mem, params_offset, input_offset, output_offset_1, b, od, ox, oy,
-            id, ix, iy, s, k, k);
+            id, ix, iy, s, k, k, px, py);
   relu_layer(mem, output_offset_1, output_offset_2, num_outputs);
 
   for (int i = 0; i < mem_len; i++) {

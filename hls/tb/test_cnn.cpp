@@ -22,15 +22,18 @@ int main() {
   int od = params.at("od");
   int s = params.at("s");
   int k = params.at("k");
+  int px = params.at("px");
+  int py = params.at("py");
 
   // basic parameter validation
-  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0) {
+  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || od <= 0 || s <= 0 || k <= 0 ||
+      px < 0 || py < 0) {
     cout << "Invalid CNN params :(" << endl;
     return -1;
   }
 
-  int ox = floor((ix - k) / s + 1);
-  int oy = floor((iy - k) / s + 1);
+  int ox = floor((ix + 2 * px - k) / s + 1);
+  int oy = floor((iy + 2 * py - k) / s + 1);
 
   int num_weights = od * k * k * id;
   int num_bias = od;
@@ -56,7 +59,7 @@ int main() {
   }
 
   cnn_layer(mem, params_offset, input_offset, output_offset, b, od, ox, oy, id,
-            ix, iy, s, k, k);
+            ix, iy, s, k, k, px, py);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
