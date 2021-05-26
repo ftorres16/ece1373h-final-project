@@ -4,7 +4,8 @@
 void max_pool_2d(float *mem, // global memory pointer
                  const int input_offset, const int output_offset, const int b,
                  const int od, const int ox, const int oy, const int id,
-                 const int ix, const int iy, const int s, const int k) {
+                 const int ix, const int iy, const int s, const int kx,
+                 const int ky) {
 
   for (int b_ = 0; b_ < b; b_++) {
     for (int o_d = 0; o_d < id; o_d++) {
@@ -15,8 +16,8 @@ void max_pool_2d(float *mem, // global memory pointer
           int addr;
 
           // input dimensions
-          for (int i_y = o_y * s, iiy = 0; i_y < o_y * s + k; i_y++, iiy++) {
-            for (int i_x = o_x * s, iix = 0; i_x < o_x * s + k; i_x++, iix++) {
+          for (int i_y = o_y * s, iiy = 0; i_y < o_y * s + ky; i_y++, iiy++) {
+            for (int i_x = o_x * s, iix = 0; i_x < o_x * s + kx; i_x++, iix++) {
 
               addr = input_offset / sizeof(float) + b_ * od * ix * iy +
                      o_d * ix * iy + i_y * ix + i_x;
