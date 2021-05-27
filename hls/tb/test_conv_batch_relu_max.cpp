@@ -27,12 +27,7 @@ int main() {
   conv_params.px = f_params.at("px");
   conv_params.py = f_params.at("py");
 
-  conv_params.ox = floor(
-      (conv_params.ix + 2 * conv_params.px - conv_params.kx) / conv_params.s +
-      1);
-  conv_params.oy = floor(
-      (conv_params.iy + 2 * conv_params.py - conv_params.ky) / conv_params.s +
-      1);
+  get_conv_out_dims(&conv_params);
 
   max_pool_params.s = f_params.at("max_pool_s");
   max_pool_params.kx = f_params.at("max_pool_kx");
@@ -43,10 +38,7 @@ int main() {
   max_pool_params.iy = conv_params.oy;
   max_pool_params.od = conv_params.od;
 
-  max_pool_params.ox =
-      floor((conv_params.ox - max_pool_params.kx) / max_pool_params.s + 1);
-  max_pool_params.oy =
-      floor((conv_params.oy - max_pool_params.ky) / max_pool_params.s + 1);
+  get_max_pool_2d_out_dims(&max_pool_params);
 
   // basic parameter validation
   if (conv_params.b <= 0 || conv_params.id <= 0 || conv_params.ix <= 0 ||

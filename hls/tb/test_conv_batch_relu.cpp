@@ -26,8 +26,7 @@ int main() {
   params.px = f_params.at("px");
   params.py = f_params.at("py");
 
-  params.ox = floor((params.ix + 2 * params.px - params.kx) / params.s + 1);
-  params.oy = floor((params.iy + 2 * params.py - params.ky) / params.s + 1);
+  get_conv_out_dims(&params);
 
   // basic parameter validation
   if (params.b <= 0 || params.id <= 0 || params.ix <= 0 || params.iy <= 0 ||

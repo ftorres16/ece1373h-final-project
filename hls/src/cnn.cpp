@@ -1,5 +1,6 @@
 #include "cnn.h"
 #include <algorithm>
+#include <cmath>
 
 void cnn_layer(float *mem,               // global memory pointer
                const int params_offset,  // ofset of parameters
@@ -64,4 +65,33 @@ void cnn_layer(float *mem,               // global memory pointer
       }
     }
   }
+}
+
+void get_conv_out_dims(CONV_LAYER_PARAMS *params) {
+  /*
+   * Convenience function.
+   * Calculate and load the output x and y dimensions into a params struct.
+   */
+  params->ox =
+      floor((params->ix + 2 * params->px - params->kx) / params->s + 1);
+  params->oy =
+      floor((params->iy + 2 * params->py - params->ky) / params->s + 1);
+}
+
+int get_conv_num_weights(CONV_LAYER_PARAMS params) {
+  return params.od * params.kx * params.ky * params.id;
+}
+
+int get_conv_num_bias(CONV_LAYER_PARAMS params) { return params.od; }
+
+int get_conv_num_params(CONV_LAYER_PARAMS params) {
+  return get_conv_num_weights(params) + get_conv_num_bias(params);
+}
+
+int get_conv_num_inputs(CONV_LAYER_PARAMS params) {
+  return params.b * params.id * params.ix * params.iy;
+}
+
+int get_conv_num_outputs(CONV_LAYER_PARAMS params) {
+  return params.b * params.od * params.ox * params.oy;
 }

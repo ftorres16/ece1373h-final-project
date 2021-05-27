@@ -27,21 +27,20 @@ int main() {
   params.px = f_params.at("px");
   params.py = f_params.at("py");
 
-  params.ox = floor((params.ix + 2 * params.px - params.kx) / params.s + 1);
-  params.oy = floor((params.iy + 2 * params.py - params.ky) / params.s + 1);
+  get_conv_out_dims(&params);
 
   // basic parameter validation
   if (params.b <= 0 || params.id <= 0 || params.ix <= 0 || params.iy <= 0 ||
-      params.od <= 0 || params.ox <= 0 || params.oy <= 0 || params.s <= 0 ||
-      params.kx <= 0 || params.ky <= 0 || params.px < 0 || params.py < 0) {
+      params.od <= 0 || params.s <= 0 || params.kx <= 0 || params.ky <= 0 ||
+      params.px < 0 || params.py < 0 || params.ox <= 0 || params.oy <= 0) {
     cout << "Invalid CNN params :(" << endl;
     return -1;
   }
 
-  int num_weights = params.od * params.kx * params.ky * params.id;
-  int num_bias = params.od;
-  int num_inputs = params.b * params.id * params.ix * params.iy;
-  int num_outputs = params.b * params.od * params.ox * params.oy;
+  int num_weights = get_conv_num_weights(params);
+  int num_bias = get_conv_num_bias(params);
+  int num_inputs = get_conv_num_inputs(params);
+  int num_outputs = get_conv_num_outputs(params);
 
   int params_offset = 0 * sizeof(float);
   int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);

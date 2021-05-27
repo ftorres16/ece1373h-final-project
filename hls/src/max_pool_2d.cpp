@@ -1,5 +1,6 @@
 #include "max_pool_2d.h"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 void max_pool_2d(float *mem, // global memory pointer
@@ -38,4 +39,22 @@ void max_pool_2d(float *mem, // global memory pointer
       }
     }
   }
+}
+
+void get_max_pool_2d_out_dims(MAX_POOL_2D_PARAMS *params) {
+  /*
+   * Convenience function.
+   * Calculate and load the output x and y dimensions into a params struct.
+   */
+  params->od = params->id;
+  params->ox = floor((params->ix - params->kx) / params->s + 1);
+  params->oy = floor((params->iy - params->ky) / params->s + 1);
+}
+
+int get_max_pool_2d_num_inputs(MAX_POOL_2D_PARAMS params) {
+  return params.b * params.id * params.ix * params.iy;
+}
+
+int get_max_pool_2d_num_outputs(MAX_POOL_2D_PARAMS params) {
+  return params.b * params.od * params.ox * params.oy;
 }

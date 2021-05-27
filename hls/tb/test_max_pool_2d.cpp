@@ -31,12 +31,10 @@ int main() {
     return -1;
   }
 
-  params.od = params.id;
-  params.ox = floor((params.ix - params.kx) / params.s + 1);
-  params.oy = floor((params.iy - params.ky) / params.s + 1);
+  get_max_pool_2d_out_dims(&params);
 
-  int num_inputs = params.b * params.id * params.ix * params.iy;
-  int num_outputs = params.b * params.od * params.ox * params.oy;
+  int num_inputs = get_max_pool_2d_num_inputs(params);
+  int num_outputs = get_max_pool_2d_num_outputs(params);
 
   int input_offset = 0 * sizeof(float);
   int output_offset = input_offset + num_inputs * sizeof(float);
