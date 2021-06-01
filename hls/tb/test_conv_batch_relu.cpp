@@ -36,10 +36,10 @@ int main() {
     return -1;
   }
 
-  int num_weights = params.od * params.kx * params.ky * params.id;
-  int num_bias = params.od;
-  int num_inputs = params.b * params.id * params.ix * params.iy;
-  int num_outputs = params.b * params.od * params.ox * params.oy;
+  int num_weights = get_conv_num_weights(params);
+  int num_bias = get_conv_num_bias(params);
+  int num_inputs = get_conv_num_inputs(params);
+  int num_outputs = get_conv_num_outputs(params);
 
   int params_offset = 0 * sizeof(float);
   int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
