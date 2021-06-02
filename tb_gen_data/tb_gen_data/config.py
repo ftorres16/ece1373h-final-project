@@ -6,6 +6,8 @@ IN_X = 2
 
 KERNEL_SIZE = 2
 STRIDE = 1
+PAD_X = 0
+PAD_Y = 1
 
 OUT_D = 4
 OUT_X = 2

@@ -1,3 +1,5 @@
+import typing as T
+
 import torch
 import torch.nn as nn
 
@@ -9,6 +11,8 @@ from config import (
     IN_X,
     OUT_D,
     OUTPUT_FOLDER,
+    PAD_X,
+    PAD_Y,
     STRIDE,
 )
 from tb_gen_data.gen_base import GenBase
@@ -23,11 +27,16 @@ class GenCNN(GenBase):
         out_d: int = OUT_D,
         kernel_size: int = KERNEL_SIZE,
         stride: int = STRIDE,
+        padding: T.Tuple[int] = (PAD_X, PAD_Y),
     ):
         super().__init__(name, out_folder)
 
         self.cnn = nn.Conv2d(
-            in_channels=in_d, out_channels=out_d, kernel_size=kernel_size, stride=stride
+            in_channels=in_d,
+            out_channels=out_d,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
         )
 
     def gen_input(
@@ -61,6 +70,8 @@ class GenCNN(GenBase):
             "od": self.cnn.weight.shape[0],
             "s": self.cnn.stride[0],
             "k": self.cnn.weight.shape[2],
+            "px": self.cnn.padding[1],
+            "py": self.cnn.padding[0],
         }
 
 

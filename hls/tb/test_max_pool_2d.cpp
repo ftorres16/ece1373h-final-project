@@ -13,27 +13,28 @@ int main() {
   string src_file = "tb_data/max_pool_2d.txt";
   string src_params = "tb_data/max_pool_2d_params.txt";
 
-  map<string, int> params = read_params(src_params);
+  MAX_POOL_2D_PARAMS params;
+  map<string, int> f_params = read_params(src_params);
 
-  int b = params.at("b");
-  int id = params.at("id");
-  int ix = params.at("ix");
-  int iy = params.at("iy");
-  int s = params.at("s");
-  int k = params.at("k");
+  params.b = f_params.at("b");
+  params.id = f_params.at("id");
+  params.ix = f_params.at("ix");
+  params.iy = f_params.at("iy");
+  params.s = f_params.at("s");
+  params.kx = f_params.at("k");
+  params.ky = f_params.at("k");
 
   // basic parameter validation
-  if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0 || s <= 0 || k <= 0) {
+  if (params.b <= 0 || params.id <= 0 || params.ix <= 0 || params.iy <= 0 ||
+      params.s <= 0 || params.kx <= 0 || params.ky <= 0) {
     cout << "Invalid MaxPool2D params :(" << endl;
     return -1;
   }
 
-  int od = id;
-  int ox = floor((ix - k) / s + 1);
-  int oy = floor((iy - k) / s + 1);
+  get_max_pool_2d_out_dims(&params);
 
-  int num_inputs = b * id * ix * iy;
-  int num_outputs = b * od * ox * oy;
+  int num_inputs = get_max_pool_2d_num_inputs(params);
+  int num_outputs = get_max_pool_2d_num_outputs(params);
 
   int input_offset = 0 * sizeof(float);
   int output_offset = input_offset + num_inputs * sizeof(float);
@@ -51,8 +52,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  max_pool_2d(mem, input_offset, output_offset, b, od, ox, oy, id, ix, iy, s,
-              k);
+  max_pool_2d(mem, input_offset, output_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
