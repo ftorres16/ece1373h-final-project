@@ -24,7 +24,7 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   conv_stack_0.id = 1;
   conv_stack_0.od = 25;
   conv_stack_0.s = 1;
-  conv_stack_0.kx = 25;
+  conv_stack_0.kx = 3;
   conv_stack_0.ky = 1;
   conv_stack_0.px = 1;
   conv_stack_0.py = 0;
@@ -36,8 +36,8 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   conv_stack_1.id = 25;
   conv_stack_1.od = 25;
   conv_stack_1.s = 1;
-  conv_stack_1.kx = 20;
-  conv_stack_1.ky = 3;
+  conv_stack_1.kx = 3;
+  conv_stack_1.ky = 20;
   conv_stack_1.px = 0;
   conv_stack_1.py = 0;
   conv_stack_1.b = conv_stack_0.b;
@@ -46,15 +46,15 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   get_conv_out_dims(&conv_stack_1);
 
   max_pool_stack_1.s = 1;
-  max_pool_stack_1.kx = 1;
-  max_pool_stack_1.ky = 2;
+  max_pool_stack_1.kx = 2;
+  max_pool_stack_1.ky = 1;
   get_max_pool_stack_params(conv_stack_1, &max_pool_stack_1);
 
   conv_stack_2.id = 25;
   conv_stack_2.od = 50;
   conv_stack_2.s = 1;
-  conv_stack_2.kx = 1;
-  conv_stack_2.ky = 3;
+  conv_stack_2.kx = 3;
+  conv_stack_2.ky = 1;
   conv_stack_2.px = 0;
   conv_stack_2.py = 0;
   conv_stack_2.b = max_pool_stack_1.b;
@@ -63,15 +63,15 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   get_conv_out_dims(&conv_stack_2);
 
   max_pool_stack_2.s = 1;
-  max_pool_stack_2.kx = 1;
-  max_pool_stack_2.ky = 2;
+  max_pool_stack_2.kx = 2;
+  max_pool_stack_2.ky = 1;
   get_max_pool_stack_params(conv_stack_2, &max_pool_stack_2);
 
   conv_stack_3.id = 50;
   conv_stack_3.od = 100;
   conv_stack_3.s = 1;
-  conv_stack_3.kx = 1;
-  conv_stack_3.ky = 2;
+  conv_stack_3.kx = 3;
+  conv_stack_3.ky = 1;
   conv_stack_3.px = 0;
   conv_stack_3.py = 0;
   conv_stack_3.b = max_pool_stack_2.b;
@@ -80,15 +80,15 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   get_conv_out_dims(&conv_stack_3);
 
   max_pool_stack_3.s = 1;
-  max_pool_stack_3.kx = 1;
-  max_pool_stack_3.ky = 2;
+  max_pool_stack_3.kx = 2;
+  max_pool_stack_3.ky = 1;
   get_max_pool_stack_params(conv_stack_3, &max_pool_stack_3);
 
   conv_stack_4.id = 100;
   conv_stack_4.od = 100;
   conv_stack_4.s = 1;
-  conv_stack_4.kx = 1;
-  conv_stack_4.ky = 5;
+  conv_stack_4.kx = 5;
+  conv_stack_4.ky = 1;
   conv_stack_4.px = 0;
   conv_stack_4.py = 0;
   conv_stack_4.b = max_pool_stack_3.b;
@@ -97,15 +97,15 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   get_conv_out_dims(&conv_stack_4);
 
   max_pool_stack_4.s = 1;
-  max_pool_stack_4.kx = 1;
-  max_pool_stack_4.ky = 2;
+  max_pool_stack_4.kx = 2;
+  max_pool_stack_4.ky = 1;
   get_max_pool_stack_params(conv_stack_4, &max_pool_stack_4);
 
   conv_stack_5.id = 100;
   conv_stack_5.od = 100;
   conv_stack_5.s = 1;
-  conv_stack_5.kx = 1;
-  conv_stack_5.ky = 5;
+  conv_stack_5.kx = 5;
+  conv_stack_5.ky = 1;
   conv_stack_5.px = 0;
   conv_stack_5.py = 0;
   conv_stack_5.b = max_pool_stack_4.b;
@@ -114,15 +114,15 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   get_conv_out_dims(&conv_stack_5);
 
   max_pool_stack_5.s = 1;
-  max_pool_stack_5.kx = 1;
-  max_pool_stack_5.ky = 2;
+  max_pool_stack_5.kx = 2;
+  max_pool_stack_5.ky = 1;
   get_max_pool_stack_params(conv_stack_5, &max_pool_stack_5);
 
   conv_fc_1.id = 100;
   conv_fc_1.od = 100;
   conv_fc_1.s = 1;
-  conv_fc_1.kx = 1;
-  conv_fc_1.ky = 29;
+  conv_fc_1.kx = 29;
+  conv_fc_1.ky = 1;
   conv_fc_1.px = 0;
   conv_fc_1.py = 0;
   conv_fc_1.b = max_pool_stack_5.b;
@@ -160,18 +160,29 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
       params_offset_fc_1 + get_conv_num_params(conv_fc_1) * sizeof(float);
 
   output_offset_0 = intermediate_results_offset;
-  y0_offset_1 = output_offset_0 + get_conv_num_outputs(conv_stack_0);
-  output_offset_1 = y0_offset_1 + get_conv_num_outputs(conv_stack_1);
-  y0_offset_2 = output_offset_1 + get_max_pool_2d_num_outputs(max_pool_stack_1);
-  output_offset_2 = y0_offset_2 + get_conv_num_outputs(conv_stack_2);
-  y0_offset_3 = output_offset_2 + get_max_pool_2d_num_outputs(max_pool_stack_2);
-  output_offset_3 = y0_offset_3 + get_conv_num_outputs(conv_stack_3);
-  y0_offset_4 = output_offset_3 + get_max_pool_2d_num_outputs(max_pool_stack_3);
-  output_offset_4 = y0_offset_4 + get_conv_num_outputs(conv_stack_4);
-  y0_offset_5 = output_offset_4 + get_max_pool_2d_num_outputs(max_pool_stack_4);
-  output_offset_5 = y0_offset_5 + get_conv_num_outputs(conv_stack_5);
+  y0_offset_1 =
+      output_offset_0 + get_conv_num_outputs(conv_stack_0) * sizeof(float);
+  output_offset_1 =
+      y0_offset_1 + get_conv_num_outputs(conv_stack_1) * sizeof(float);
+  y0_offset_2 = output_offset_1 +
+                get_max_pool_2d_num_outputs(max_pool_stack_1) * sizeof(float);
+  output_offset_2 =
+      y0_offset_2 + get_conv_num_outputs(conv_stack_2) * sizeof(float);
+  y0_offset_3 = output_offset_2 +
+                get_max_pool_2d_num_outputs(max_pool_stack_2) * sizeof(float);
+  output_offset_3 =
+      y0_offset_3 + get_conv_num_outputs(conv_stack_3) * sizeof(float);
+  y0_offset_4 = output_offset_3 +
+                get_max_pool_2d_num_outputs(max_pool_stack_3) * sizeof(float);
+  output_offset_4 =
+      y0_offset_4 + get_conv_num_outputs(conv_stack_4) * sizeof(float);
+  y0_offset_5 = output_offset_4 +
+                get_max_pool_2d_num_outputs(max_pool_stack_4) * sizeof(float);
+  output_offset_5 =
+      y0_offset_5 + get_conv_num_outputs(conv_stack_5) * sizeof(float);
   output_offset_fc_1 =
-      output_offset_5 + get_max_pool_2d_num_outputs(max_pool_stack_5);
+      output_offset_5 +
+      get_max_pool_2d_num_outputs(max_pool_stack_5) * sizeof(float);
 
   // Neural network computation
   conv_batch_relu_layer(mem, params_offset_0, input_offset, output_offset_0,
@@ -179,6 +190,7 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
 
   conv_batch_relu_max_layer(mem, params_offset_1, output_offset_0, y0_offset_1,
                             output_offset_1, conv_stack_1, max_pool_stack_1);
+
   conv_batch_relu_max_layer(mem, params_offset_2, output_offset_1, y0_offset_2,
                             output_offset_2, conv_stack_2, max_pool_stack_2);
 
