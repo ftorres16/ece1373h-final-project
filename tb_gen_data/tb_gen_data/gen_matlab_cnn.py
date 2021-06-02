@@ -50,19 +50,18 @@ class GenMatlabCNN(GenBase):
 
         self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
+        print(f"total len: {len(self.mem)}")
         print(f"input len: {len(torch.flatten(self.input_))}")
         print(f"params len: {sum(len(torch.flatten(param)) for param in params)}")
-        print(
-            "all outputs len: ",
-            sum(len(torch.flatten(output)) for output in outputs),
-        )
         print(
             "intermediate outputs len: ",
             sum(len(torch.flatten(output)) for output in outputs[:-1]),
         )
-        print(f"first output len: {len(torch.flatten(outputs[0]))}")
         print(f"last output len: {len(torch.flatten(outputs[-1]))}")
-        print(f"total len: {len(self.mem)}")
+        print(
+            "all outputs len: ",
+            sum(len(torch.flatten(output)) for output in outputs),
+        )
 
     def _gen_params(self):
         self.params = {}
