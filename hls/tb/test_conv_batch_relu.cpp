@@ -21,8 +21,8 @@ int main() {
   params.iy = f_params.at("iy");
   params.od = f_params.at("od");
   params.s = f_params.at("s");
-  params.kx = f_params.at("k");
-  params.ky = f_params.at("k");
+  params.kx = f_params.at("kx");
+  params.ky = f_params.at("ky");
   params.px = f_params.at("px");
   params.py = f_params.at("py");
 
@@ -63,7 +63,7 @@ int main() {
                         params);
 
   for (int i = 0; i < mem_len; i++) {
-    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
+    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.15) {
       cout << "ERROR when comparing mem[" << i << "]. Expected: " << mem_gold[i]
            << " Got: " << mem[i] << endl;
       passed = false;
