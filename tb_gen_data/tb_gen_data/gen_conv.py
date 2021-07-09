@@ -18,7 +18,7 @@ from config import (
 from tb_gen_data.gen_base import GenBase
 
 
-class GenCNN(GenBase):
+class GenConv(GenBase):
     def __init__(
         self,
         name: str,
@@ -31,7 +31,7 @@ class GenCNN(GenBase):
     ):
         super().__init__(name, out_folder)
 
-        self.cnn = nn.Conv2d(
+        self.conv = nn.Conv2d(
             in_channels=in_d,
             out_channels=out_d,
             kernel_size=kernel_size,
@@ -49,12 +49,12 @@ class GenCNN(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
-        self.output = self.cnn(self.input_)
+        self.output = self.conv(self.input_)
 
     def _gen_mem(self):
         flat_tensors = [
-            torch.flatten(self.cnn.weight),
-            self.cnn.bias,
+            torch.flatten(self.conv.weight),
+            self.conv.bias,
             torch.flatten(self.input_),
             torch.flatten(self.output),
         ]
@@ -67,18 +67,18 @@ class GenCNN(GenBase):
             "id": self.input_.shape[1],
             "ix": self.input_.shape[3],
             "iy": self.input_.shape[2],
-            "od": self.cnn.weight.shape[0],
-            "s": self.cnn.stride[0],
-            "k": self.cnn.weight.shape[2],
-            "px": self.cnn.padding[1],
-            "py": self.cnn.padding[0],
+            "od": self.conv.weight.shape[0],
+            "s": self.conv.stride[0],
+            "k": self.conv.weight.shape[2],
+            "px": self.conv.padding[1],
+            "py": self.conv.padding[0],
         }
 
 
 if __name__ == "__main__":
     torch.manual_seed(0)
 
-    gen = GenCNN("cnn")
+    gen = GenConv("conv")
 
     gen.gen_input()
     gen.gen_output()

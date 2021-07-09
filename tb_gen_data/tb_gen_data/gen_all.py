@@ -1,7 +1,7 @@
 import torch
 
 from tb_gen_data.gen_batch_norm import GenBatchNorm2D
-from tb_gen_data.gen_cnn import GenCNN
+from tb_gen_data.gen_conv import GenConv
 from tb_gen_data.gen_fc import GenFC
 from tb_gen_data.gen_max_pool_2d import GenMaxPool2D
 from tb_gen_data.gen_relu import GenReLU
@@ -9,7 +9,7 @@ from tb_gen_data.gen_relu import GenReLU
 if __name__ == "__main__":
     gens = {
         GenBatchNorm2D: "batch_norm_2d",
-        GenCNN: "cnn",
+        GenConv: "conv",
         GenFC: "fc",
         GenMaxPool2D: "max_pool_2d",
         GenReLU: "relu",
