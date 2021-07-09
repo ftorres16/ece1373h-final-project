@@ -3,6 +3,7 @@ OUT_FOLDER := bin
 vpath %.cpp tb src
 vpath %.h tb src
 
+.PHONY: all
 all: $(OUT_FOLDER)/cnn $(OUT_FOLDER)/fc $(OUT_FOLDER)/relu $(OUT_FOLDER)/max_pool_2d $(OUT_FOLDER)/batch_norm_2d $(OUT_FOLDER)/conv_relu $(OUT_FOLDER)/conv_batch_relu $(OUT_FOLDER)/conv_batch_relu_max $(OUT_FOLDER)/full_nn
 
 $(OUT_FOLDER)/cnn: test_cnn.cpp utils.cpp utils.h cnn.cpp cnn.h
