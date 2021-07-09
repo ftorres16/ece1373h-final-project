@@ -10,7 +10,7 @@ echo ""
 echo "Testing..."
 
 ./bin/batch_norm_2d
-./bin/cnn
+./bin/conv
 ./bin/fc
 ./bin/max_pool_2d
 ./bin/relu

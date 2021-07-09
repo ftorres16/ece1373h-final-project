@@ -1,5 +1,5 @@
-#ifndef CNN_H
-#define CNN_H
+#ifndef CONV_H
+#define CONV_H
 
 typedef struct CONV_LAYER_PARAMS {
   int b;  // batch size
@@ -20,11 +20,11 @@ typedef struct CONV_LAYER_PARAMS {
 typedef struct CONV_LAYER_OUT_DIMS {
 } CONV_LAYER_OUT_DIMS;
 
-void cnn_layer(float *mem,              // global memory pointer
-               const int params_offset, // offset of parameters
-               const int input_offset,  // offset of inputs
-               const int output_offset, // offset of outputs
-               CONV_LAYER_PARAMS params);
+void conv_layer(float *mem,              // global memory pointer
+                const int params_offset, // offset of parameters
+                const int input_offset,  // offset of inputs
+                const int output_offset, // offset of outputs
+                CONV_LAYER_PARAMS params);
 
 void get_conv_out_dims(CONV_LAYER_PARAMS *params);
 

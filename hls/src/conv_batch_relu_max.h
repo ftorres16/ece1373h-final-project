@@ -1,7 +1,7 @@
 #ifndef CONV_BATCH_RELU_MAX_H
 #define CONV_BATCH_RELU_MAX_H
 
-#include "cnn.h"
+#include "conv.h"
 #include "max_pool_2d.h"
 
 void conv_batch_relu_max_layer(float *mem, const int params_offset,
