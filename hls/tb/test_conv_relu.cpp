@@ -1,4 +1,4 @@
-#include "../src/cnn.h"
+#include "../src/conv.h"
 #include "../src/relu.h"
 #include "utils.h"
 #include <cmath>
@@ -63,7 +63,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  cnn_layer(mem, params_offset, input_offset, output_offset_1, params);
+  conv_layer(mem, params_offset, input_offset, output_offset_1, params);
   relu_layer(mem, output_offset_1, output_offset_2, num_outputs);
 
   for (int i = 0; i < mem_len; i++) {

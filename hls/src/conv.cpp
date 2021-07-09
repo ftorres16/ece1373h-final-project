@@ -1,12 +1,12 @@
-#include "cnn.h"
+#include "conv.h"
 #include <algorithm>
 #include <cmath>
 
-void cnn_layer(float *mem,               // global memory pointer
-               const int params_offset,  // ofset of parameters
-               const int input_offset,   // offset of inputs
-               const int output_offset,  // offset of outputs
-               CONV_LAYER_PARAMS params) // padding y
+void conv_layer(float *mem,               // global memory pointer
+                const int params_offset,  // ofset of parameters
+                const int input_offset,   // offset of inputs
+                const int output_offset,  // offset of outputs
+                CONV_LAYER_PARAMS params) // padding y
 {
 
   int num_weights = params.id * params.od * params.kx * params.ky;

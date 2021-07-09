@@ -1,4 +1,4 @@
-#include "../src/cnn.h"
+#include "../src/conv.h"
 #include "utils.h"
 #include <cmath>
 #include <iostream>
@@ -10,8 +10,8 @@ using namespace std;
 int main() {
   bool passed = true;
 
-  string src_file = "tb_data/cnn.txt";
-  string src_params = "tb_data/cnn_params.txt";
+  string src_file = "tb_data/conv.txt";
+  string src_params = "tb_data/conv_params.txt";
 
   CONV_LAYER_PARAMS params;
   map<string, int> f_params = read_params(src_params);
@@ -60,7 +60,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  cnn_layer(mem, params_offset, input_offset, output_offset, params);
+  conv_layer(mem, params_offset, input_offset, output_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
