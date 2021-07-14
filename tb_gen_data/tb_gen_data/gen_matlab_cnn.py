@@ -24,7 +24,7 @@ class GenMatlabCNN(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
-        # self.model.eval()
+        self.model.eval()
         self.output = self.model(self.input_)
 
     def _gen_mem(self):
@@ -35,6 +35,20 @@ class GenMatlabCNN(GenBase):
             if isinstance(layer, nn.Conv2d):
                 params.append(layer.weight)
                 params.append(layer.bias)
+
+            if isinstance(layer, nn.BatchNorm2d):
+                params.append(layer.running_mean)
+                params.append(layer.running_var)
+                params.append(
+                    layer.weight
+                    if layer.weight is not None
+                    else torch.tensor([1.0] * layer.num_features)
+                )
+                params.append(
+                    layer.bias
+                    if layer.bias is not None
+                    else torch.tensor([0.0] * layer.num_features)
+                )
 
             if (
                 isinstance(layer, nn.ReLU)

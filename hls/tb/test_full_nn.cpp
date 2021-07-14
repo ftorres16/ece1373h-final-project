@@ -9,9 +9,9 @@ int main() {
   bool passed = true;
   string src_file = "tb_data/full_nn.txt";
 
-  int mem_len = 1957946;
+  int mem_len = 1959546;
   int num_inputs = 3400;
-  int num_params = 447027;
+  int num_params = 448627;
   int num_intermediate_outputs = 1507225;
   int num_outputs = 294;
 
