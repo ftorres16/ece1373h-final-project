@@ -36,16 +36,20 @@ int main() {
     return -1;
   }
 
-  int num_weights = get_conv_num_weights(params);
-  int num_bias = get_conv_num_bias(params);
+  int num_conv_weights = get_conv_num_weights(params);
+  int num_conv_bias = get_conv_num_bias(params);
+  int num_bn_weights = 4 * params.od;
   int num_inputs = get_conv_num_inputs(params);
   int num_outputs = get_conv_num_outputs(params);
 
   int params_offset = 0 * sizeof(float);
-  int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
+  int input_offset =
+      params_offset +
+      (num_conv_weights + num_conv_bias + num_bn_weights) * sizeof(float);
   int output_offset = input_offset + num_inputs * sizeof(float);
 
-  int mem_len = num_weights + num_bias + num_inputs + num_outputs;
+  int mem_len = num_conv_weights + num_conv_bias + num_bn_weights + num_inputs +
+                num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
@@ -73,7 +77,7 @@ int main() {
   if (passed) {
     cout << "Conv + BatchNorm + ReLU test successful. :)" << endl;
   } else {
-    cout << "Conv + BathNorm + ReLU test failed :(" << endl;
+    cout << "Conv + BatchNorm + ReLU test failed :(" << endl;
     return -1;
   }
 }
