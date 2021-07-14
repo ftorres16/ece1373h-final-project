@@ -53,12 +53,27 @@ class GenConvBatchRelu(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
+        self.model.eval()
         self.output = self.model(self.input_)
 
     def _gen_mem(self):
+        bn_weight = (
+            self.model.batch_norm.weight
+            if self.model.batch_norm.weight is not None
+            else torch.tensor([1.0] * OUT_D)
+        )
+        bn_bias = (
+            self.model.batch_norm.bias
+            if self.model.batch_norm.bias is not None
+            else torch.tensor([0.0] * OUT_D)
+        )
         flat_tensors = [
             torch.flatten(self.model.conv.weight),
             self.model.conv.bias,
+            self.model.batch_norm.running_mean,
+            self.model.batch_norm.running_var,
+            bn_weight,
+            bn_bias,
             torch.flatten(self.input_),
             torch.flatten(self.model.y2),
             torch.flatten(self.output),
@@ -74,7 +89,8 @@ class GenConvBatchRelu(GenBase):
             "iy": self.input_.shape[2],
             "od": self.model.conv.weight.shape[0],
             "s": self.model.conv.stride[0],
-            "k": self.model.conv.weight.shape[2],
+            "kx": self.model.conv.weight.shape[3],
+            "ky": self.model.conv.weight.shape[2],
             "px": self.model.conv.padding[1],
             "py": self.model.conv.padding[0],
             "max_pool_s": self.model.max_pool.stride,

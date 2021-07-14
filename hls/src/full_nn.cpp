@@ -145,17 +145,23 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
   // Memory layout
   params_offset_0 = params_offset;
   params_offset_1 =
-      params_offset_0 + get_conv_num_params(conv_stack_0) * sizeof(float);
+      params_offset_0 +
+      (get_conv_num_params(conv_stack_0) + 4 * conv_stack_0.od) * sizeof(float);
   params_offset_2 =
-      params_offset_1 + get_conv_num_params(conv_stack_1) * sizeof(float);
+      params_offset_1 +
+      (get_conv_num_params(conv_stack_1) + 4 * conv_stack_1.od) * sizeof(float);
   params_offset_3 =
-      params_offset_2 + get_conv_num_params(conv_stack_2) * sizeof(float);
+      params_offset_2 +
+      (get_conv_num_params(conv_stack_2) + 4 * conv_stack_2.od) * sizeof(float);
   params_offset_4 =
-      params_offset_3 + get_conv_num_params(conv_stack_3) * sizeof(float);
+      params_offset_3 +
+      (get_conv_num_params(conv_stack_3) + 4 * conv_stack_3.od) * sizeof(float);
   params_offset_5 =
-      params_offset_4 + get_conv_num_params(conv_stack_4) * sizeof(float);
+      params_offset_4 +
+      (get_conv_num_params(conv_stack_4) + 4 * conv_stack_4.od) * sizeof(float);
   params_offset_fc_1 =
-      params_offset_5 + get_conv_num_params(conv_stack_5) * sizeof(float);
+      params_offset_5 +
+      (get_conv_num_params(conv_stack_5) + 4 * conv_stack_5.od) * sizeof(float);
   params_offset_fc_2 =
       params_offset_fc_1 + get_conv_num_params(conv_fc_1) * sizeof(float);
 
@@ -204,7 +210,7 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
                             output_offset_5, conv_stack_5, max_pool_stack_5);
 
   conv_layer(mem, params_offset_fc_1, output_offset_5, output_offset_fc_1,
-            conv_fc_1);
+             conv_fc_1);
 
   relu_layer(mem, output_offset_fc_1, output_offset_fc_1,
              conv_fc_1.b * conv_fc_1.od * conv_fc_1.ox * conv_fc_1.oy);

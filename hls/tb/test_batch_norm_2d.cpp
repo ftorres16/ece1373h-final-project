@@ -21,17 +21,19 @@ int main() {
 
   // basic parameter validation
   if (b <= 0 || id <= 0 || ix <= 0 || iy <= 0) {
-    cout << "Invalid ReLU params :(" << endl;
+    cout << "Invalid batch norm params :(" << endl;
     return -1;
   }
 
   int num_inputs = b * id * iy * ix;
   int num_outputs = b * id * ix * iy;
+  int num_params = 4 * id;
 
-  int input_offset = 0 * sizeof(float);
+  int params_offset = 0 * sizeof(float);
+  int input_offset = params_offset + num_params * sizeof(float);
   int output_offset = input_offset + num_inputs * sizeof(float);
 
-  int mem_len = num_inputs + num_outputs;
+  int mem_len = num_params + num_inputs + num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
@@ -45,7 +47,8 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  batch_norm_2d_layer(mem, input_offset, output_offset, b, id, ix, iy);
+  batch_norm_2d_layer(mem, params_offset, input_offset, output_offset, b, id,
+                      ix, iy);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem_gold[i] - mem[i]) > 0.1 * abs(mem[i])) {

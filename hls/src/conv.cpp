@@ -9,7 +9,7 @@ void conv_layer(float *mem,               // global memory pointer
                 CONV_LAYER_PARAMS params) // padding y
 {
 
-  int num_weights = params.id * params.od * params.kx * params.ky;
+  int num_weights = get_conv_num_weights(params);
   // int num_input = b * id * ix * iy;
 
   // Batch
