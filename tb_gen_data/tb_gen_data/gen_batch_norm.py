@@ -21,10 +21,29 @@ class GenBatchNorm2D(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
+        self.batch_norm.eval()
         self.output = self.batch_norm(self.input_)
 
     def _gen_mem(self):
-        flat_tensors = [torch.flatten(self.input_), torch.flatten(self.output)]
+        weight = (
+            self.batch_norm.weight
+            if self.batch_norm.weight is not None
+            else torch.tensor([1.0] * IN_D)
+        )
+        bias = (
+            self.batch_norm.bias
+            if self.batch_norm.bias is not None
+            else torch.tensor([0.0] * IN_D)
+        )
+
+        flat_tensors = [
+            self.batch_norm.running_mean,
+            self.batch_norm.running_var,
+            weight,
+            bias,
+            torch.flatten(self.input_),
+            torch.flatten(self.output),
+        ]
 
         self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
