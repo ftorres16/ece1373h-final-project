@@ -27,7 +27,7 @@ $(OUT_FOLDER)/conv_relu: test_conv_relu.cpp utils.cpp utils.h conv.cpp conv.h re
 $(OUT_FOLDER)/conv_batch_relu: test_conv_batch_relu.cpp utils.cpp utils.h conv.cpp conv.h relu.cpp relu.h batch_norm_2d.cpp batch_norm_2d.h conv_batch_relu.cpp conv_batch_relu.h
 	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
-$(OUT_FOLDER)/conv_batch_relu_max: test_conv_batch_relu_max.cpp utils.cpp utils.h conv.cpp conv.h relu.cpp relu.h batch_norm_2d.cpp batch_norm_2d.h max_pool_2d.cpp max_pool_2d.h conv_batch_relu_max.cpp conv_batch_relu_max.h
+$(OUT_FOLDER)/conv_batch_relu_max: test_conv_batch_relu_max.cpp utils.cpp utils.h conv.cpp conv.h relu.cpp relu.h batch_norm_2d.cpp batch_norm_2d.h max_pool_2d.cpp max_pool_2d.h conv_batch_relu.cpp conv_batch_relu.h conv_batch_relu_max.cpp conv_batch_relu_max.h
 	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
 $(OUT_FOLDER)/full_nn: test_full_nn.cpp utils.cpp utils.h conv.cpp conv.h relu.cpp relu.h batch_norm_2d.cpp batch_norm_2d.h max_pool_2d.cpp max_pool_2d.h conv_batch_relu.h conv_batch_relu.cpp conv_batch_relu_max.cpp conv_batch_relu_max.h full_nn.cpp full_nn.h

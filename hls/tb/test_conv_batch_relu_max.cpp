@@ -1,4 +1,5 @@
 #include "../src/conv_batch_relu_max.h"
+#include "../src/max_pool_2d.h"
 #include "utils.h"
 #include <cmath>
 #include <iostream>
@@ -22,8 +23,8 @@ int main() {
   conv_params.iy = f_params.at("iy");
   conv_params.od = f_params.at("od");
   conv_params.s = f_params.at("s");
-  conv_params.kx = f_params.at("k");
-  conv_params.ky = f_params.at("k");
+  conv_params.kx = f_params.at("kx");
+  conv_params.ky = f_params.at("ky");
   conv_params.px = f_params.at("px");
   conv_params.py = f_params.at("py");
 
@@ -58,23 +59,22 @@ int main() {
     return -1;
   }
 
-  int num_weights =
-      conv_params.od * conv_params.kx * conv_params.ky * conv_params.id;
-  int num_bias = conv_params.od;
-  int num_inputs =
-      conv_params.b * conv_params.id * conv_params.ix * conv_params.iy;
-  int num_y0_outputs =
-      conv_params.b * conv_params.od * conv_params.ox * conv_params.oy;
-  int num_outputs = max_pool_params.b * max_pool_params.od *
-                    max_pool_params.ox * max_pool_params.oy;
+  int num_conv_weights = get_conv_num_weights(conv_params);
+  int num_conv_bias = get_conv_num_bias(conv_params);
+  int num_bn_weights = 4 * conv_params.od;
+  int num_inputs = get_conv_num_inputs(conv_params);
+  int num_y0_outputs = get_conv_num_outputs(conv_params);
+  int num_outputs = get_max_pool_2d_num_outputs(max_pool_params);
 
   int params_offset = 0 * sizeof(float);
-  int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
+  int input_offset =
+      params_offset +
+      (num_conv_weights + num_conv_bias + num_bn_weights) * sizeof(float);
   int y0_offset = input_offset + num_inputs * sizeof(float);
   int output_offset = y0_offset + num_y0_outputs * sizeof(float);
 
-  int mem_len =
-      num_weights + num_bias + num_inputs + num_y0_outputs + num_outputs;
+  int mem_len = num_conv_weights + num_conv_bias + num_bn_weights + num_inputs +
+                num_y0_outputs + num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
