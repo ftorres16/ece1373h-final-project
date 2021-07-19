@@ -11,6 +11,7 @@ int main() {
   bool passed = true;
 
   string src_file = "tb_data/conv_batch_relu_max.txt";
+  string src_pre_file = "tb_data/conv_batch_relu_max_pre.txt";
   string src_params = "tb_data/conv_batch_relu_max_params.txt";
 
   CONV_LAYER_PARAMS conv_params;
@@ -62,34 +63,39 @@ int main() {
   int num_conv_weights = get_conv_num_weights(conv_params);
   int num_conv_bias = get_conv_num_bias(conv_params);
   int num_bn_weights = 4 * conv_params.od;
-  int num_inputs = get_conv_num_inputs(conv_params);
-  int num_y0_outputs = get_conv_num_outputs(conv_params);
-  int num_outputs = get_max_pool_2d_num_outputs(max_pool_params);
+  int num_inputs = std::max(get_conv_num_inputs(conv_params),
+                            get_max_pool_2d_num_outputs(max_pool_params));
+  int num_outputs = get_conv_num_outputs(conv_params);
 
   int params_offset = 0 * sizeof(float);
   int input_offset =
       params_offset +
       (num_conv_weights + num_conv_bias + num_bn_weights) * sizeof(float);
-  int y0_offset = input_offset + num_inputs * sizeof(float);
-  int output_offset = y0_offset + num_y0_outputs * sizeof(float);
+  int output_offset = input_offset + num_inputs * sizeof(float);
 
   int mem_len = num_conv_weights + num_conv_bias + num_bn_weights + num_inputs +
-                num_y0_outputs + num_outputs;
+                num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
 
-  if (!load_txt(mem_gold, src_file, mem_len)) {
+  if (!load_txt(mem_gold, src_pre_file, mem_len)) {
     cout << "Could not load mem :(" << endl;
     return -1;
   }
 
-  for (int i = 0; i < mem_len - num_y0_outputs - num_outputs; i++) {
+  for (int i = 0; i < mem_len - num_outputs; i++) {
     mem[i] = mem_gold[i];
   }
 
-  conv_batch_relu_max_layer(mem, params_offset, input_offset, y0_offset,
-                            output_offset, conv_params, max_pool_params);
+  conv_batch_relu_max_layer(mem, params_offset, input_offset, output_offset,
+                            conv_params, max_pool_params);
+
+  // load post mem
+  if (!load_txt(mem_gold, src_file, mem_len)) {
+    cout << "Could not load mem :(" << endl;
+    return -1;
+  }
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
