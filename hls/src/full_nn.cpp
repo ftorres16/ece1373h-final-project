@@ -1,6 +1,7 @@
 #include "conv.h"
 #include "conv_batch_relu.h"
 #include "conv_batch_relu_max.h"
+#include "conv_relu.h"
 #include "relu.h"
 
 /*
@@ -182,10 +183,8 @@ void full_nn(float *mem, const int params_offset, const int mem_0_offset,
   conv_batch_relu_max_layer(mem, params_offset_5, mem_1_offset, mem_0_offset,
                             conv_stack_5, max_pool_stack_5);
 
-  conv_layer(mem, params_offset_fc_1, mem_1_offset, mem_0_offset, conv_fc_1);
-
-  relu_layer(mem, mem_0_offset, mem_0_offset,
-             conv_fc_1.b * conv_fc_1.od * conv_fc_1.ox * conv_fc_1.oy);
+  conv_relu_layer(mem, params_offset_fc_1, mem_1_offset, mem_0_offset,
+                  conv_fc_1);
 
   conv_layer(mem, params_offset_fc_2, mem_0_offset, mem_1_offset, conv_fc_2);
 }
