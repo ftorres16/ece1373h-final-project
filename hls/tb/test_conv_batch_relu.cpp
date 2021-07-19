@@ -43,10 +43,10 @@ int main() {
   int num_outputs = get_conv_num_outputs(params);
 
   int params_offset = 0 * sizeof(float);
-  int input_offset =
+  int mem_0_offset =
       params_offset +
       (num_conv_weights + num_conv_bias + num_bn_weights) * sizeof(float);
-  int output_offset = input_offset + num_inputs * sizeof(float);
+  int mem_1_offset = mem_0_offset + num_inputs * sizeof(float);
 
   int mem_len = num_conv_weights + num_conv_bias + num_bn_weights + num_inputs +
                 num_outputs;
@@ -63,8 +63,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  conv_batch_relu_layer(mem, params_offset, input_offset, output_offset,
-                        params);
+  conv_batch_relu_layer(mem, params_offset, mem_0_offset, mem_1_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.15) {

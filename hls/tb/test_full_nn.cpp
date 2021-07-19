@@ -36,13 +36,13 @@ int main() {
   }
 
   int params_offset = 0;
-  int input_offset = params_offset + num_params * sizeof(float);
-  int output_offset = input_offset + mem_0_len * sizeof(float);
+  int mem_0_offset = params_offset + num_params * sizeof(float);
+  int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
   int b = 1;
   int ix = 50;
   int iy = 68;
 
-  full_nn(mem, params_offset, input_offset, output_offset, b, ix, iy);
+  full_nn(mem, params_offset, mem_0_offset, mem_1_offset, b, ix, iy);
 
   int error_count = 0;
   bool flag = false;
@@ -77,8 +77,8 @@ int main() {
     cout << "Full NN test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
-    cout << "input offset: " << input_offset / sizeof(float) << endl;
-    cout << "output offset: " << output_offset / sizeof(float) << endl;
+    cout << "mem_0 offset: " << mem_0_offset / sizeof(float) << endl;
+    cout << "mem_1 offset: " << mem_1_offset / sizeof(float) << endl;
     return -1;
   }
 }
