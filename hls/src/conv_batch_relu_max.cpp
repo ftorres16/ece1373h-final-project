@@ -3,15 +3,19 @@
 #include "max_pool_2d.h"
 #include "relu.h"
 
+/*
+ * Write the input into `mem_0`, then read it from `mem_0`.
+ * `mem_1` is an intermediate output.
+ */
 void conv_batch_relu_max_layer(float *mem, const int params_offset,
-                               const int input_offset, const int output_offset,
+                               const int mem_0_offset, const int mem_1_offset,
                                CONV_LAYER_PARAMS conv_params,
                                MAX_POOL_2D_PARAMS max_pool_params) {
 
-  conv_batch_relu_layer(mem, params_offset, input_offset, output_offset,
+  conv_batch_relu_layer(mem, params_offset, mem_0_offset, mem_1_offset,
                         conv_params);
 
-  max_pool_2d(mem, output_offset, input_offset, max_pool_params);
+  max_pool_2d(mem, mem_1_offset, mem_0_offset, max_pool_params);
 }
 
 void get_max_pool_stack_params(CONV_LAYER_PARAMS &conv_params,

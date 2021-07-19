@@ -3,8 +3,12 @@
 #include "conv_batch_relu_max.h"
 #include "relu.h"
 
-void full_nn(float *mem, const int params_offset, const int input_offset,
-             const int output_offset, const int b, const int ix, const int iy) {
+/*
+ * Write the input into `mem_0`, then read it from `mem_1`.
+ * Be careful about the sizes of memory.
+ */
+void full_nn(float *mem, const int params_offset, const int mem_0_offset,
+             const int mem_1_offset, const int b, const int ix, const int iy) {
 
   int params_offset_0, params_offset_1, params_offset_2, params_offset_3,
       params_offset_4, params_offset_5, params_offset_fc_1, params_offset_fc_2;
@@ -160,28 +164,28 @@ void full_nn(float *mem, const int params_offset, const int input_offset,
       params_offset_fc_1 + get_conv_num_params(conv_fc_1) * sizeof(float);
 
   // Neural network computation
-  conv_batch_relu_layer(mem, params_offset_0, input_offset, output_offset,
+  conv_batch_relu_layer(mem, params_offset_0, mem_0_offset, mem_1_offset,
                         conv_stack_0);
 
-  conv_batch_relu_max_layer(mem, params_offset_1, output_offset, input_offset,
+  conv_batch_relu_max_layer(mem, params_offset_1, mem_1_offset, mem_0_offset,
                             conv_stack_1, max_pool_stack_1);
 
-  conv_batch_relu_max_layer(mem, params_offset_2, output_offset, input_offset,
+  conv_batch_relu_max_layer(mem, params_offset_2, mem_1_offset, mem_0_offset,
                             conv_stack_2, max_pool_stack_2);
 
-  conv_batch_relu_max_layer(mem, params_offset_3, output_offset, input_offset,
+  conv_batch_relu_max_layer(mem, params_offset_3, mem_1_offset, mem_0_offset,
                             conv_stack_3, max_pool_stack_3);
 
-  conv_batch_relu_max_layer(mem, params_offset_4, output_offset, input_offset,
+  conv_batch_relu_max_layer(mem, params_offset_4, mem_1_offset, mem_0_offset,
                             conv_stack_4, max_pool_stack_4);
 
-  conv_batch_relu_max_layer(mem, params_offset_5, output_offset, input_offset,
+  conv_batch_relu_max_layer(mem, params_offset_5, mem_1_offset, mem_0_offset,
                             conv_stack_5, max_pool_stack_5);
 
-  conv_layer(mem, params_offset_fc_1, output_offset, input_offset, conv_fc_1);
+  conv_layer(mem, params_offset_fc_1, mem_1_offset, mem_0_offset, conv_fc_1);
 
-  relu_layer(mem, input_offset, input_offset,
+  relu_layer(mem, mem_0_offset, mem_0_offset,
              conv_fc_1.b * conv_fc_1.od * conv_fc_1.ox * conv_fc_1.oy);
 
-  conv_layer(mem, params_offset_fc_2, input_offset, output_offset, conv_fc_2);
+  conv_layer(mem, params_offset_fc_2, mem_0_offset, mem_1_offset, conv_fc_2);
 }
