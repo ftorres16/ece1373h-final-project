@@ -31,7 +31,6 @@ class GenConvRelu(GenBase):
         tensors.append(self.input_)
 
         # output
-        tensors.append(self.model.y0)
         tensors.append(self.model.y1)
 
         flat_tensors = [torch.flatten(tensor) for tensor in tensors]
