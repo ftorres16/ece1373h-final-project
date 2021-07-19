@@ -14,8 +14,12 @@ class GenBase:
         self.input_ = None
         self.output = None
 
-        self.mem: T.Dict[str, int] = []
-        self.params: T.List[str] = {}
+        self.mem: T.List[str] = []
+        self.params: T.Dict[str, int] = {}
+
+        # memory before any computations take place
+        self.mem_pre: T.List[str] = []
+        self.out_pre_file = f"{out_folder}/{name}_pre.txt"
 
     def gen_input(self):
         """
@@ -43,6 +47,21 @@ class GenBase:
 
         with open(self.out_file, "w") as f:
             f.writelines(self.mem)
+
+    def _gen_mem_pre(self):
+        """
+        Load the memory layout before any computation takes place in `self.mem_pre`.
+        """
+        raise NotImplementedError("This is an abstract class.")
+
+    def write_mem_pre(self):
+        """
+        Write the memory layout before any computation takes place from `self.mem_pre`.
+        """
+        self._gen_mem_pre()
+
+        with open(self.out_pre_file, "w") as f:
+            f.writelines(self.mem_pre)
 
     def _gen_params(self):
         """

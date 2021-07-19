@@ -16,6 +16,7 @@ from config import (
 )
 from tb_gen_data.gen_base import GenBase
 from tb_gen_data.models.conv_batch_relu_max import ConvBatchReluMax
+from tb_gen_data.utils import gen_mem_overwrite
 
 
 class GenConvBatchRelu(GenBase):
@@ -56,17 +57,30 @@ class GenConvBatchRelu(GenBase):
         self.model.eval()
         self.output = self.model(self.input_)
 
-    def _gen_mem(self):
-        bn_weight = (
+    def _get_bn_weight(self) -> torch.tensor:
+        """
+        Get the batch norm weight.
+        """
+        return (
             self.model.batch_norm.weight
             if self.model.batch_norm.weight is not None
             else torch.tensor([1.0] * OUT_D)
         )
-        bn_bias = (
+
+    def _get_bn_bias(self) -> torch.tensor:
+        """
+        Get the batch norm bias.
+        """
+        return (
             self.model.batch_norm.bias
             if self.model.batch_norm.bias is not None
             else torch.tensor([0.0] * OUT_D)
         )
+
+    def _gen_mem_pre(self):
+        bn_weight = self._get_bn_weight()
+        bn_bias = self._get_bn_bias()
+
         flat_tensors = [
             torch.flatten(self.model.conv.weight),
             self.model.conv.bias,
@@ -75,8 +89,26 @@ class GenConvBatchRelu(GenBase):
             bn_weight,
             bn_bias,
             torch.flatten(self.input_),
-            torch.flatten(self.model.y2),
-            torch.flatten(self.output),
+            torch.flatten(torch.zeros_like(self.model.y2)),
+        ]
+
+        self.mem_pre = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
+
+    def _gen_mem(self):
+        bn_weight = self._get_bn_weight()
+        bn_bias = self._get_bn_bias()
+
+        mem_0, mem_1 = gen_mem_overwrite([self.input_, self.model.y2, self.output])
+
+        flat_tensors = [
+            torch.flatten(self.model.conv.weight),
+            self.model.conv.bias,
+            self.model.batch_norm.running_mean,
+            self.model.batch_norm.running_var,
+            bn_weight,
+            bn_bias,
+            mem_0,
+            mem_1,
         ]
 
         self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
@@ -106,5 +138,6 @@ if __name__ == "__main__":
 
     gen.gen_input()
     gen.gen_output()
+    gen.write_mem_pre()
     gen.write_mem()
     gen.write_params()
