@@ -1,5 +1,4 @@
-#include "../src/conv.h"
-#include "../src/relu.h"
+#include "../src/conv_relu.h"
 #include "utils.h"
 #include <cmath>
 #include <iostream>
@@ -46,10 +45,9 @@ int main() {
 
   int params_offset = 0 * sizeof(float);
   int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
-  int output_offset_1 = input_offset + num_inputs * sizeof(float);
-  int output_offset_2 = output_offset_1 + num_outputs * sizeof(float);
+  int output_offset = input_offset + num_inputs * sizeof(float);
 
-  int mem_len = num_weights + num_bias + num_inputs + num_outputs * 2;
+  int mem_len = num_weights + num_bias + num_inputs + num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
@@ -63,8 +61,7 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  conv_layer(mem, params_offset, input_offset, output_offset_1, params);
-  relu_layer(mem, output_offset_1, output_offset_2, num_outputs);
+  conv_relu_layer(mem, params_offset, input_offset, output_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
     if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
