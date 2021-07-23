@@ -14,6 +14,7 @@ echo "Testing..."
 ./bin/fc
 ./bin/max_pool_2d
 ./bin/relu
+./bin/zero_mean
 ./bin/conv_relu
 ./bin/conv_batch_relu
 ./bin/conv_batch_relu_max
