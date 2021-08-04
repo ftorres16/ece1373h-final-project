@@ -19,3 +19,6 @@ echo "Testing..."
 ./bin/conv_batch_relu
 ./bin/conv_batch_relu_max
 ./bin/full_nn
+
+# Matlab NN doesn't match because softmax is not implemented in hardware
+# ./bin/matlab_nn

@@ -10,16 +10,9 @@ int main() {
   string src_file = "tb_data/full_nn.txt";
   string src_pre_file = "tb_data/full_nn_pre.txt";
 
-  // int mem_len = 855327;
   int mem_len = 477587;
-  // int num_inputs = 3400;
-  // int num_params = 448627;
   int num_params = 449587;
-  // int num_outputs = 85000;
-
-  // int mem_0_len = 205800;
   int mem_0_len = 24000;
-  // int mem_1_len = 85000;
 
   float *mem, *mem_gold;
 
