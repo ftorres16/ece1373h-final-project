@@ -15,16 +15,114 @@ class GenMatlabCNN(GenBase):
     def __init__(self, name: str, out_folder: str = OUTPUT_FOLDER):
         super().__init__(name, out_folder)
 
+        self.in_y = 20
+        self.in_x = 48
+
         self.model = MatlabCNN()
 
     def gen_input(
-        self, batch_size: int = 1, in_d: int = 1, in_y: int = 20, in_x: int = 48
+        self,
+        batch_size: int = 1,
+        in_d: int = 1,
+        in_y: T.Optional[int] = None,
+        in_x: T.Optional[int] = None,
     ):
-        self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
+        if in_y is None:
+            in_y = self.in_y
+        if in_x is None:
+            in_x = self.in_x
+
+        # self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
+        self.input_ = torch.zeros(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
         self.model.eval()
         self.output = self.model(self.input_)
+
+        # # test exporting for matlab
+        # aux = self.model.outputs[7]
+        # aux = torch.squeeze(aux, 0)
+        # aux = aux.permute(1, 2, 0)
+        # aux = aux.numpy()
+        # import scipy.io
+        # scipy.io.savemat("test.mat", dict(aux_py=aux))
+
+    def _load_mem_entry(
+        self,
+        mem: T.List[float],
+        from_idx: int,
+        layer: nn.Module,
+        param: str,
+    ) -> int:
+        """
+        Helper for `_load_mem_file`
+        """
+        to_idx = from_idx + len(torch.flatten(getattr(layer, param)))
+
+        param_tensor = mem[from_idx:to_idx]
+        param_tensor = torch.tensor(param_tensor)
+        param_tensor = param_tensor.reshape(getattr(layer, param).shape)
+        param_tensor = nn.Parameter(param_tensor)
+        param_tensor.requires_grad = False
+
+        setattr(
+            layer,
+            param,
+            param_tensor,
+        )
+
+        return to_idx
+
+    def _load_mem_1d(
+        self, mem: T.List[float], from_idx: int, layer: nn.Module, param: str, n: int
+    ) -> int:
+        """
+        Helper for `_load_mem_file`
+        """
+        to_idx = from_idx + n
+
+        param_tensor = torch.tensor(mem[from_idx:to_idx])
+        param_tensor = nn.Parameter(param_tensor)
+        param_tensor.requires_grad = False
+
+        setattr(layer, param, param_tensor)
+
+        return to_idx
+
+    def _load_mem_file(self):
+        with open(f"{OUTPUT_FOLDER}/matlab_nn.txt") as f:
+            mem = [float(line.strip()) for line in f.readlines()]
+
+        from_idx = 0
+        to_idx = 0
+        for layer in self.model.layers:
+            from_idx = to_idx
+
+            if isinstance(layer, ZeroMean):
+                to_idx = self._load_mem_entry(mem, from_idx, layer, "mean")
+            elif isinstance(layer, nn.Conv2d):
+                to_idx = self._load_mem_entry(mem, from_idx, layer, "weight")
+                to_idx = self._load_mem_entry(mem, to_idx, layer, "bias")
+            elif isinstance(layer, nn.BatchNorm2d):
+                to_idx = self._load_mem_1d(
+                    mem, from_idx, layer, "running_mean", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "running_var", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "weight", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "bias", n=layer.num_features
+                )
+
+        in_len = 1 * 1 * self.in_y * self.in_x
+        from_idx = to_idx
+        to_idx = from_idx + in_len
+        # self.input_ = torch.tensor(mem[from_idx:to_idx]).reshape(
+        #     (1, 1, self.in_y, self.in_x)
+        # )
 
     def _get_outputs(self) -> T.List[torch.tensor]:
         """
@@ -175,6 +273,7 @@ if __name__ == "__main__":
 
     gen = GenMatlabCNN("full_nn")
     gen.gen_input()
+    gen._load_mem_file()
     gen.gen_output()
     gen.write_mem_pre()
     gen.write_mem()
