@@ -10,16 +10,9 @@ int main() {
   string src_file = "tb_data/full_nn.txt";
   string src_pre_file = "tb_data/full_nn_pre.txt";
 
-  // int mem_len = 855327;
-  int mem_len = 855327;
-  // int num_inputs = 3400;
-  // int num_params = 448627;
-  int num_params = 448627;
-  // int num_outputs = 85000;
-
-  // int mem_0_len = 205800;
-  int mem_0_len = 205800;
-  // int mem_1_len = 85000;
+  int mem_len = 477587;
+  int num_params = 449587;
+  int mem_0_len = 24000;
 
   float *mem, *mem_gold;
 
@@ -39,8 +32,8 @@ int main() {
   int mem_0_offset = params_offset + num_params * sizeof(float);
   int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
   int b = 1;
-  int ix = 50;
-  int iy = 68;
+  int ix = 48;
+  int iy = 20;
 
   full_nn(mem, params_offset, mem_0_offset, mem_1_offset, b, ix, iy);
 

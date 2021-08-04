@@ -1,76 +1,90 @@
 import typing as T
 
-# import onnx
-import torch
-import torch.nn as nn
-
-# from onnx2pytorch import ConvertModel
+import numpy as np
+import onnx
+import onnxruntime
+from onnx import numpy_helper
 
 from config import OUTPUT_FOLDER
 from tb_gen_data.gen_base import GenBase
-from tb_gen_data.models.matlab_cnn import MatlabCNN
-from tb_gen_data.utils import gen_mem_overwrite
 
 
 class GenMatlabCNN(GenBase):
     def __init__(self, name: str, out_folder: str = OUTPUT_FOLDER):
         super().__init__(name, out_folder)
 
-        # self.onnx_model = onnx.load("inputs/trainedModelDeepNetCNN.onnx")
-        # self.model = ConvertModel(self.onnx_model)
+        onnx_path = "inputs/trainedModelDeepNetCNN.onnx"
 
-        self.model = MatlabCNN()
+        self.onnx_model = onnx.load(onnx_path)
+        onnx.checker.check_model(self.onnx_model)
+
+        self.ort_session = onnxruntime.InferenceSession(onnx_path)
 
     def gen_input(
-        self, batch_size: int = 1, in_d: int = 1, in_y: int = 68, in_x: int = 50
+        self, batch_size: int = 1, in_d: int = 1, in_y: int = 20, in_x: int = 48
     ):
-        self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
+        # np_input = np.random.randn(batch_size, in_d, in_y, in_x).astype("f")
+        np_input = np.zeros((batch_size, in_d, in_y, in_x)).astype("f")
+        self.input_ = {self.ort_session.get_inputs()[0].name: np_input}
 
     def gen_output(self):
-        self.model.eval()
-        self.output = self.model(self.input_)
+        [self.output] = self.ort_session.run(None, self.input_)
+        self.output = np.ndarray.flatten(self.output)
 
-    def _get_outputs(self) -> T.List[torch.tensor]:
-        """
-        Get all model outputs as a list.
-        """
-        outputs = []
-
-        for idx, layer in enumerate(self.model.layers):
-            if (
-                isinstance(layer, nn.ReLU)
-                or isinstance(layer, nn.MaxPool2d)
-                or idx == len(self.model.layers) - 1
-            ):
-                # print(layer)
-                outputs.append(self.model.outputs[idx])
-
-        return outputs
-
-    def _get_model_params(self) -> T.List[torch.tensor]:
+    def _get_model_params(self) -> T.List[np.ndarray]:
         """
         Get all model params as a list.
         """
-        params = []
+        layers = {
+            layer.name: numpy_helper.to_array(layer)
+            for layer in self.onnx_model.graph.initializer
+        }
 
-        for idx, layer in enumerate(self.model.layers):
-            if isinstance(layer, nn.Conv2d):
-                params.append(layer.weight)
-                params.append(layer.bias)
-            elif isinstance(layer, nn.BatchNorm2d):
-                params.append(layer.running_mean)
-                params.append(layer.running_var)
-                params.append(
-                    layer.weight
-                    if layer.weight is not None
-                    else torch.tensor([1.0] * layer.num_features)
-                )
-                params.append(
-                    layer.bias
-                    if layer.bias is not None
-                    else torch.tensor([0.0] * layer.num_features)
-                )
+        param_names = [
+            "imageinput_Mean",
+            "conv_1_W",
+            "conv_1_B",
+            "batchnorm_1_mean",
+            "batchnorm_1_var",
+            "batchnorm_1_scale",
+            "batchnorm_1_B",
+            "conv_2_W",
+            "conv_2_B",
+            "batchnorm_2_mean",
+            "batchnorm_2_var",
+            "batchnorm_2_scale",
+            "batchnorm_2_B",
+            "conv_3_W",
+            "conv_3_B",
+            "batchnorm_3_mean",
+            "batchnorm_3_var",
+            "batchnorm_3_scale",
+            "batchnorm_3_B",
+            "conv_4_W",
+            "conv_4_B",
+            "batchnorm_4_mean",
+            "batchnorm_4_var",
+            "batchnorm_4_scale",
+            "batchnorm_4_B",
+            "conv_5_W",
+            "conv_5_B",
+            "batchnorm_5_mean",
+            "batchnorm_5_var",
+            "batchnorm_5_scale",
+            "batchnorm_5_B",
+            "conv_6_W",
+            "conv_6_B",
+            "batchnorm_6_mean",
+            "batchnorm_6_var",
+            "batchnorm_6_scale",
+            "batchnorm_6_B",
+            "fc_1_W",
+            "fc_1_B",
+            "fc_2_W",
+            "fc_2_B",
+        ]
 
+        params = [layers[param] for param in param_names]
         return params
 
     def _gen_mem_pre(self):
@@ -78,105 +92,56 @@ class GenMatlabCNN(GenBase):
         Get the memory before doing any computations.
         """
         params = self._get_model_params()
-        outputs = self._get_outputs()
 
-        mem_0, mem_1 = gen_mem_overwrite([self.input_] + outputs)
+        # because we cant easily get intermediate values from ONNX runtime
+        # use the pytorch value
+        mem_0 = np.zeros(24_000)
+        mem_1 = np.zeros(4_000)
 
-        mem_0 = torch.zeros_like(mem_0)
-        mem_0[: len(torch.flatten(self.input_))] = torch.flatten(self.input_)
+        flat_input = np.ndarray.flatten(list(self.input_.values())[0])
 
-        mem_1 = torch.zeros_like(mem_1)
+        mem_0[: len(flat_input)] = flat_input
 
         tensors = params + [mem_0, mem_1]
-        flat_tensors = [torch.flatten(tensor) for tensor in tensors]
+        flat_tensors = [np.ndarray.flatten(tensor) for tensor in tensors]
 
         self.mem_pre = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
-        # print(f"params len: {sum(len(torch.flatten(param)) for param in params)}")
-        # print(f"mem_0 len: {len(torch.flatten(mem_0))}")
-        # print(f"mem_1 len: {len(torch.flatten(mem_1))}")
-        # print(f"pre mem len: {len(self.mem_pre)}")
-
     def _gen_mem(self):
         params = self._get_model_params()
-        outputs = self._get_outputs()
+        self.gen_output()
 
-        mem_0, mem_1 = gen_mem_overwrite([self.input_] + outputs)
+        mem_0 = np.zeros(24_000)
+        mem_1 = np.zeros(4_000)
+
+        mem_0[: len(self.output)] = self.output
 
         tensors = params + [mem_0, mem_1]
 
-        flat_tensors = [torch.flatten(tensor) for tensor in tensors]
+        flat_tensors = [np.ndarray.flatten(tensor) for tensor in tensors]
 
         self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
 
         print(f"int mem_len = {len(self.mem)};")
-        print(f"int num_params = {sum(len(torch.flatten(param)) for param in params)};")
-        print(f"int mem_0_len = {len(torch.flatten(mem_0))};")
-        # print(f"mem_1 len: {len(torch.flatten(mem_1))}")
-        # print(f"input len: {len(torch.flatten(self.input_))}")
-        # print(f"last output len: {len(torch.flatten(outputs[-1]))}")
+        print(
+            f"int num_params = {sum(len(np.ndarray.flatten(param)) for param in params)};"
+        )
+        print(f"int mem_0_len = {len(np.ndarray.flatten(mem_0))};")
+        # print(f"mem_1 len: {len(np.ndarray.flatten(mem_1))}")
+        # print(f"input len: {len(np.ndarray.flatten(self.input_))}")
+        # print(f"last output len: {len(np.ndarray.flatten(outputs[-1]))}")
         # print(
         #     "all outputs len: ",
-        #     sum(len(torch.flatten(mem)) for mem in [mem_0, mem_1]),
+        #     sum(len(np.ndarray.flatten(mem)) for mem in [mem_0, mem_1]),
         # )
-
-    def _gen_params(self):
-        self.params = {}
-
-        for idx, layer in enumerate(self.model.layers):
-            # input_ = getattr(self.model, f"y_{idx - 1}") if idx > 0 else self.input_
-            input_ = self.model.outputs[idx - 1] if idx > 0 else self.input_
-            # output = getattr(self.model, f"y_{idx}")
-
-            _params = {}
-
-            if isinstance(layer, nn.Conv2d):
-                _params = {
-                    "b": input_.shape[0],
-                    "id": input_.shape[1],
-                    "ix": input_.shape[3],
-                    "iy": input_.shape[2],
-                    "od": layer.weight.shape[0],
-                    "s": layer.stride[0],
-                    "kx": layer.weight.shape[3],
-                    "ky": layer.weight.shape[2],
-                    "px": layer.padding[1],
-                    "py": layer.padding[0],
-                }
-            elif isinstance(layer, nn.BatchNorm2d):
-                _params = {
-                    "b": input_.shape[0],
-                    "id": input_.shape[1],
-                    "ix": input_.shape[3],
-                    "iy": input_.shape[2],
-                }
-            elif isinstance(layer, nn.ReLU):
-                _params = {
-                    "b": input_.shape[0],
-                    "id": input_.shape[1],
-                    "ix": input_.shape[3],
-                    "iy": input_.shape[2],
-                }
-
-            elif isinstance(layer, nn.MaxPool2d):
-                _params = {
-                    "b": input_.shape[0],
-                    "id": input_.shape[1],
-                    "ix": input_.shape[3],
-                    "iy": input_.shape[2],
-                }
-
-            _params = {f"{idx}_{key}": val for key, val in _params.items()}
-
-            self.params.update(_params)
 
 
 if __name__ == "__main__":
-    torch.manual_seed(0)
+    np.random.seed(0)
 
-    gen = GenMatlabCNN("full_nn")
+    gen = GenMatlabCNN("matlab_nn")
     gen.gen_input()
     gen.gen_output()
     gen.write_mem_pre()
     gen.write_mem()
-    gen.write_params()
+    # gen.write_params()
