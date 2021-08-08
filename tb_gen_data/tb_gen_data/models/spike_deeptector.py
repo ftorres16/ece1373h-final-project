@@ -4,7 +4,7 @@ import torch.nn as nn
 from tb_gen_data.models.zero_mean import ZeroMean
 
 
-class MatlabCNN(nn.Module):
+class SpikeDeeptector(nn.Module):
     def __init__(self):
         super().__init__()
 

@@ -6,19 +6,19 @@ import torch.nn as nn
 
 from config import OUTPUT_FOLDER
 from tb_gen_data.gen_base import GenBase
-from tb_gen_data.models.full_nn import MatlabCNN
+from tb_gen_data.models.spike_deeptector import SpikeDeeptector
 from tb_gen_data.models.zero_mean import ZeroMean
 from tb_gen_data.utils import gen_mem_overwrite
 
 
-class GenMatlabCNN(GenBase):
+class GenSpikeDeeptector(GenBase):
     def __init__(self, name: str, out_folder: str = OUTPUT_FOLDER):
         super().__init__(name, out_folder)
 
         self.in_y = 20
         self.in_x = 48
 
-        self.model = MatlabCNN()
+        self.model = SpikeDeeptector()
 
     def gen_input(
         self,
@@ -271,7 +271,7 @@ class GenMatlabCNN(GenBase):
 if __name__ == "__main__":
     torch.manual_seed(0)
 
-    gen = GenMatlabCNN("full_nn")
+    gen = GenSpikeDeeptector("spike_deeptector")
     gen.gen_input()
     gen._load_mem_file()
     gen.gen_output()
