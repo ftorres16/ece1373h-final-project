@@ -9,11 +9,11 @@ from config import OUTPUT_FOLDER
 from tb_gen_data.gen_base import GenBase
 
 
-class GenMatlabCNN(GenBase):
+class GenMatlabSpikeDeeptector(GenBase):
     def __init__(self, name: str, out_folder: str = OUTPUT_FOLDER):
         super().__init__(name, out_folder)
 
-        onnx_path = "inputs/trainedModelDeepNetCNN.onnx"
+        onnx_path = "inputs/spike_deeptector.onnx"
 
         self.onnx_model = onnx.load(onnx_path)
         onnx.checker.check_model(self.onnx_model)
@@ -139,7 +139,7 @@ class GenMatlabCNN(GenBase):
 if __name__ == "__main__":
     np.random.seed(0)
 
-    gen = GenMatlabCNN("matlab_nn")
+    gen = GenMatlabSpikeDeeptector("matlab_spike_deeptector")
     gen.gen_input()
     gen.gen_output()
     gen.write_mem_pre()

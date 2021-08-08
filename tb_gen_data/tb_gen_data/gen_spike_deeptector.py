@@ -90,7 +90,7 @@ class GenSpikeDeeptector(GenBase):
         return to_idx
 
     def _load_mem_file(self):
-        with open(f"{OUTPUT_FOLDER}/matlab_nn.txt") as f:
+        with open(f"{OUTPUT_FOLDER}/matlab_spike_deeptector.txt") as f:
             mem = [float(line.strip()) for line in f.readlines()]
 
         from_idx = 0
