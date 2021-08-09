@@ -1,0 +1,94 @@
+import typing as T
+
+import torch
+from torch import nn
+
+from config import OUTPUT_FOLDER
+from tb_gen_data.gen_base import GenBase
+from tb_gen_data.models.zero_mean import ZeroMean
+
+
+class GenLoadWeightsBase(GenBase):
+    """
+    Same as GenBase, but with extra functions for loading weights from files.
+    """
+
+    def __init__(
+        self, name: str, mem_weights_file: str, out_folder: str = OUTPUT_FOLDER
+    ):
+        super().__init__(name, out_folder)
+
+        self.mem_weights_file = mem_weights_file
+
+    def _load_mem_file(self):
+        with open(f"{self.out_folder}/{self.mem_weights_file}") as f:
+            mem = [float(line.strip()) for line in f.readlines()]
+
+        from_idx = 0
+        to_idx = 0
+        for layer in self.model.layers:
+            from_idx = to_idx
+
+            if isinstance(layer, ZeroMean):
+                to_idx = self._load_mem_entry(mem, from_idx, layer, "mean")
+            elif isinstance(layer, nn.Conv2d):
+                to_idx = self._load_mem_entry(mem, from_idx, layer, "weight")
+                to_idx = self._load_mem_entry(mem, to_idx, layer, "bias")
+            elif isinstance(layer, nn.BatchNorm2d):
+                to_idx = self._load_mem_1d(
+                    mem, from_idx, layer, "running_mean", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "running_var", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "weight", n=layer.num_features
+                )
+                to_idx = self._load_mem_1d(
+                    mem, to_idx, layer, "bias", n=layer.num_features
+                )
+
+        in_len = 1 * 1 * self.in_y * self.in_x
+        from_idx = to_idx
+        to_idx = from_idx + in_len
+        # self.input_ = torch.tensor(mem[from_idx:to_idx]).reshape(
+        #     (1, 1, self.in_y, self.in_x)
+        # )
+
+    def _load_mem_entry(
+        self,
+        mem: T.List[float],
+        from_idx: int,
+        layer: nn.Module,
+        param: str,
+    ) -> int:
+        """
+        Helper for `_load_mem_file`. Load values from `mem[from_idx]` info `layer.param`
+        """
+        to_idx = from_idx + len(torch.flatten(getattr(layer, param)))
+
+        param_tensor = mem[from_idx:to_idx]
+        param_tensor = torch.tensor(param_tensor)
+        param_tensor = param_tensor.reshape(getattr(layer, param).shape)
+        param_tensor = nn.Parameter(param_tensor)
+        param_tensor.requires_grad = False
+
+        setattr(layer, param, param_tensor)
+
+        return to_idx
+
+    def _load_mem_1d(
+        self, mem: T.List[float], from_idx: int, layer: nn.Module, param: str, n: int
+    ) -> int:
+        """
+        Helper for `_load_mem_file`. Load values from `mem[from_idx]` info `layer.param` in 1d.
+        """
+        to_idx = from_idx + n
+
+        param_tensor = torch.tensor(mem[from_idx:to_idx])
+        param_tensor = nn.Parameter(param_tensor)
+        param_tensor.requires_grad = False
+
+        setattr(layer, param, param_tensor)
+
+        return to_idx

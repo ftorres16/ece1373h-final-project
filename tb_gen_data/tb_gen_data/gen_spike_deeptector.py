@@ -1,19 +1,20 @@
 import typing as T
 
-# import onnx
 import torch
-import torch.nn as nn
+from torch import nn
 
 from config import OUTPUT_FOLDER
-from tb_gen_data.gen_base import GenBase
+from tb_gen_data.gen_load_weights_base import GenLoadWeightsBase
 from tb_gen_data.models.spike_deeptector import SpikeDeeptector
 from tb_gen_data.models.zero_mean import ZeroMean
 from tb_gen_data.utils import gen_mem_overwrite
 
 
-class GenSpikeDeeptector(GenBase):
+class GenSpikeDeeptector(GenLoadWeightsBase):
     def __init__(self, name: str, out_folder: str = OUTPUT_FOLDER):
-        super().__init__(name, out_folder)
+        super().__init__(
+            name, mem_weights_file="matlab_spike_deeptector.txt", out_folder=out_folder
+        )
 
         self.in_y = 20
         self.in_x = 48
@@ -46,83 +47,6 @@ class GenSpikeDeeptector(GenBase):
         # aux = aux.numpy()
         # import scipy.io
         # scipy.io.savemat("test.mat", dict(aux_py=aux))
-
-    def _load_mem_entry(
-        self,
-        mem: T.List[float],
-        from_idx: int,
-        layer: nn.Module,
-        param: str,
-    ) -> int:
-        """
-        Helper for `_load_mem_file`
-        """
-        to_idx = from_idx + len(torch.flatten(getattr(layer, param)))
-
-        param_tensor = mem[from_idx:to_idx]
-        param_tensor = torch.tensor(param_tensor)
-        param_tensor = param_tensor.reshape(getattr(layer, param).shape)
-        param_tensor = nn.Parameter(param_tensor)
-        param_tensor.requires_grad = False
-
-        setattr(
-            layer,
-            param,
-            param_tensor,
-        )
-
-        return to_idx
-
-    def _load_mem_1d(
-        self, mem: T.List[float], from_idx: int, layer: nn.Module, param: str, n: int
-    ) -> int:
-        """
-        Helper for `_load_mem_file`
-        """
-        to_idx = from_idx + n
-
-        param_tensor = torch.tensor(mem[from_idx:to_idx])
-        param_tensor = nn.Parameter(param_tensor)
-        param_tensor.requires_grad = False
-
-        setattr(layer, param, param_tensor)
-
-        return to_idx
-
-    def _load_mem_file(self):
-        with open(f"{OUTPUT_FOLDER}/matlab_spike_deeptector.txt") as f:
-            mem = [float(line.strip()) for line in f.readlines()]
-
-        from_idx = 0
-        to_idx = 0
-        for layer in self.model.layers:
-            from_idx = to_idx
-
-            if isinstance(layer, ZeroMean):
-                to_idx = self._load_mem_entry(mem, from_idx, layer, "mean")
-            elif isinstance(layer, nn.Conv2d):
-                to_idx = self._load_mem_entry(mem, from_idx, layer, "weight")
-                to_idx = self._load_mem_entry(mem, to_idx, layer, "bias")
-            elif isinstance(layer, nn.BatchNorm2d):
-                to_idx = self._load_mem_1d(
-                    mem, from_idx, layer, "running_mean", n=layer.num_features
-                )
-                to_idx = self._load_mem_1d(
-                    mem, to_idx, layer, "running_var", n=layer.num_features
-                )
-                to_idx = self._load_mem_1d(
-                    mem, to_idx, layer, "weight", n=layer.num_features
-                )
-                to_idx = self._load_mem_1d(
-                    mem, to_idx, layer, "bias", n=layer.num_features
-                )
-
-        in_len = 1 * 1 * self.in_y * self.in_x
-        from_idx = to_idx
-        to_idx = from_idx + in_len
-        # self.input_ = torch.tensor(mem[from_idx:to_idx]).reshape(
-        #     (1, 1, self.in_y, self.in_x)
-        # )
 
     def _get_outputs(self) -> T.List[torch.tensor]:
         """

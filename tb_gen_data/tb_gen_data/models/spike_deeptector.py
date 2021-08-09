@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn
 
 from tb_gen_data.models.zero_mean import ZeroMean
 
