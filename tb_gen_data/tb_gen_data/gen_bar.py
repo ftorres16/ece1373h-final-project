@@ -121,7 +121,7 @@ class GenBAR(GenLoadWeightsBase):
         print(f"int mem_len = {len(self.mem)};")
         print(f"int num_params = {sum(len(torch.flatten(param)) for param in params)};")
         print(f"int mem_0_len = {len(torch.flatten(mem_0))};")
-        print(f"int mem_1 len = {len(torch.flatten(mem_1))};")
+        # print(f"int mem_1 len = {len(torch.flatten(mem_1))};")
 
     def _gen_params(self):
         self.params = {}
