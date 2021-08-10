@@ -1,4 +1,4 @@
-#include "../src/spike_deeptector_cumulative.h"
+#include "../../src/spike_deeptector/spike_deeptector_cumulative.h"
 #include <iostream>
 
 using namespace std;

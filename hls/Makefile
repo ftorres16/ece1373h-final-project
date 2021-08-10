@@ -1,7 +1,7 @@
 OUT_FOLDER := bin
 
-vpath %.cpp tb tb/layers src src/layers
-vpath %.h tb src src/layers
+vpath %.cpp tb tb/layers tb/spike_deeptector src src/layers src/spike_deeptector
+vpath %.h tb src src/layers src/spike_deeptector
 
 .PHONY: all
 all: $(OUT_FOLDER)/conv $(OUT_FOLDER)/fc $(OUT_FOLDER)/relu $(OUT_FOLDER)/zero_mean $(OUT_FOLDER)/max_pool_2d $(OUT_FOLDER)/batch_norm_2d $(OUT_FOLDER)/conv_relu $(OUT_FOLDER)/conv_batch_relu $(OUT_FOLDER)/conv_batch_relu_max $(OUT_FOLDER)/spike_deeptector $(OUT_FOLDER)/bar $(OUT_FOLDER)/spike_deeptector_single_run $(OUT_FOLDER)/spike_deeptector_cumulative $(OUT_FOLDER)/spike_deeptector_main

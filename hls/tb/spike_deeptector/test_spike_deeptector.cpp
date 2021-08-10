@@ -1,6 +1,5 @@
-#include "../src/spike_deeptector.h"
-#include "../src/spike_deeptector_single_run.h"
-#include "utils.h"
+#include "../../src/spike_deeptector/spike_deeptector.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 
@@ -38,11 +37,7 @@ int main() {
   params.ix = 48;
   params.iy = 20;
 
-  int out[params.b];
-  int out_gold[params.b] = {1};
-
-  spike_deeptector_single_run(mem, params_offset, mem_0_offset, mem_1_offset,
-                              out, params);
+  spike_deeptector(mem, params_offset, mem_0_offset, mem_1_offset, params);
 
   int error_count = 0;
   bool flag = false;
@@ -71,18 +66,10 @@ int main() {
   free(mem);
   free(mem_gold);
 
-  // check output
-  for (int i = 0; i < params.b; i++) {
-    if (out[i] != out_gold[i]) {
-      cout << "Error when comparing out[" << i << "]. Expeted: " << out_gold[i]
-           << " Got: " << out[i] << endl;
-    }
-  }
-
   if (passed) {
-    cout << "SpikeDeeptector single run test successful. :)" << endl;
+    cout << "SpikeDeeptector test successful. :)" << endl;
   } else {
-    cout << "SpikeDeeptector single run test failed :(" << endl;
+    cout << "SpikeDeeptector test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
     cout << "mem_0 offset: " << mem_0_offset / sizeof(float) << endl;

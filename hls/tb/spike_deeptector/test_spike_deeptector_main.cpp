@@ -1,5 +1,6 @@
-#include "../src/spike_deeptector.h"
-#include "utils.h"
+#include "../../src/spike_deeptector/spike_deeptector.h"
+#include "../../src/spike_deeptector/spike_deeptector_main.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 
@@ -31,17 +32,20 @@ int main() {
   int params_offset = 0;
   int mem_0_offset = params_offset + num_params * sizeof(float);
   int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
-  SPIKE_DEPETECTOR_PARAMS params;
 
-  params.b = 1;
-  params.ix = 48;
-  params.iy = 20;
+  int b = 1, n_electrodes = 1;
 
-  spike_deeptector(mem, params_offset, mem_0_offset, mem_1_offset, params);
+  int n_neural_channels = 0;
+  int output_labels[n_electrodes];
+  int output_labels_gold[] = {};
+
+  spike_deeptector_main(mem, params_offset, mem_0_offset, mem_1_offset,
+                        mem_0_offset, output_labels, &n_neural_channels,
+                        n_electrodes, b);
 
   int error_count = 0;
   bool flag = false;
-  int first_failed_idx = 0;
+  int first_failed_idx = -1;
 
   if (!load_txt(mem_gold, src_file, mem_len)) {
     cout << "Could not load mem :(" << endl;
@@ -66,10 +70,25 @@ int main() {
   free(mem);
   free(mem_gold);
 
+  // Test outputs
+  if (n_neural_channels > n_electrodes) {
+    passed = false;
+    cout << "ERROR: More neural channels than electrodes." << endl;
+  }
+
+  for (int i = 0; i < n_neural_channels; i++) {
+    if (output_labels[i] != output_labels_gold[i]) {
+      passed = false;
+      cout << "ERROR when comparing output_labels[" << i
+           << "]. Expected: " << output_labels_gold[i]
+           << " Got: " << output_labels[i] << endl;
+    }
+  }
+
   if (passed) {
-    cout << "SpikeDeeptector test successful. :)" << endl;
+    cout << "SpikeDeeptector main test successful. :)" << endl;
   } else {
-    cout << "SpikeDeeptector test failed :(" << endl;
+    cout << "SpikeDeeptector main test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
     cout << "mem_0 offset: " << mem_0_offset / sizeof(float) << endl;
