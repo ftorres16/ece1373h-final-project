@@ -1,5 +1,5 @@
-#include "../src/bar.h"
-#include "utils.h"
+#include "../../src/bar/bar.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 

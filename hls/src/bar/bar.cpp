@@ -1,8 +1,8 @@
-#include "layers/conv.h"
-#include "layers/conv_batch_relu.h"
-#include "layers/conv_batch_relu_max.h"
-#include "layers/conv_relu.h"
-#include "layers/zero_mean.h"
+#include "../layers/conv.h"
+#include "../layers/conv_batch_relu.h"
+#include "../layers/conv_batch_relu_max.h"
+#include "../layers/conv_relu.h"
+#include "../layers/zero_mean.h"
 
 /*
  * Write the input into `mem_0`, then read it from `mem_1`.
