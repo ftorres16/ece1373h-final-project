@@ -1,17 +1,16 @@
-#include "../src/conv_relu.h"
+#include "../src/layers/conv_batch_relu.h"
 #include "utils.h"
 #include <cmath>
 #include <iostream>
 #include <map>
-#include <string>
 
 using namespace std;
 
 int main() {
   bool passed = true;
 
-  string src_file = "tb_data/conv_relu.txt";
-  string src_params = "tb_data/conv_relu_params.txt";
+  string src_file = "tb_data/conv_batch_relu.txt";
+  string src_params = "tb_data/conv_batch_relu_params.txt";
 
   CONV_LAYER_PARAMS params;
   map<string, int> f_params = read_params(src_params);
@@ -22,13 +21,12 @@ int main() {
   params.iy = f_params.at("iy");
   params.od = f_params.at("od");
   params.s = f_params.at("s");
-  params.kx = f_params.at("k");
-  params.ky = f_params.at("k");
+  params.kx = f_params.at("kx");
+  params.ky = f_params.at("ky");
   params.px = f_params.at("px");
   params.py = f_params.at("py");
 
-  params.ox = floor((params.ix + 2 * params.px - params.kx) / params.s + 1);
-  params.oy = floor((params.iy + 2 * params.py - params.ky) / params.s + 1);
+  get_conv_out_dims(&params);
 
   // basic parameter validation
   if (params.b <= 0 || params.id <= 0 || params.ix <= 0 || params.iy <= 0 ||
@@ -38,16 +36,20 @@ int main() {
     return -1;
   }
 
-  int num_weights = params.od * params.kx * params.ky * params.id;
-  int num_bias = params.od;
-  int num_inputs = params.b * params.id * params.ix * params.iy;
-  int num_outputs = params.b * params.od * params.ox * params.oy;
+  int num_conv_weights = get_conv_num_weights(params);
+  int num_conv_bias = get_conv_num_bias(params);
+  int num_bn_weights = 4 * params.od;
+  int num_inputs = get_conv_num_inputs(params);
+  int num_outputs = get_conv_num_outputs(params);
 
   int params_offset = 0 * sizeof(float);
-  int input_offset = params_offset + (num_weights + num_bias) * sizeof(float);
-  int output_offset = input_offset + num_inputs * sizeof(float);
+  int mem_0_offset =
+      params_offset +
+      (num_conv_weights + num_conv_bias + num_bn_weights) * sizeof(float);
+  int mem_1_offset = mem_0_offset + num_inputs * sizeof(float);
 
-  int mem_len = num_weights + num_bias + num_inputs + num_outputs;
+  int mem_len = num_conv_weights + num_conv_bias + num_bn_weights + num_inputs +
+                num_outputs;
 
   float mem[mem_len];
   float mem_gold[mem_len];
@@ -61,10 +63,10 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  conv_relu_layer(mem, params_offset, input_offset, output_offset, params);
+  conv_batch_relu_layer(mem, params_offset, mem_0_offset, mem_1_offset, params);
 
   for (int i = 0; i < mem_len; i++) {
-    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
+    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.15) {
       cout << "ERROR when comparing mem[" << i << "]. Expected: " << mem_gold[i]
            << " Got: " << mem[i] << endl;
       passed = false;
@@ -72,9 +74,9 @@ int main() {
   }
 
   if (passed) {
-    cout << "Conv + ReLU test successful. :)" << endl;
+    cout << "Conv + BatchNorm + ReLU test successful. :)" << endl;
   } else {
-    cout << "Conv + ReLU test failed :(" << endl;
+    cout << "Conv + BatchNorm + ReLU test failed :(" << endl;
     return -1;
   }
 }
