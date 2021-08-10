@@ -3,8 +3,8 @@
 
 #include "spike_deeptector.h"
 
-void spike_deeptector_single_run(float *mem, const int params_offset,
-                                 const int mem_0_offset, const int mem_1_offset,
+void spike_deeptector_single_run(float *mem,
+                                 const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
                                  int *out,
                                  const SPIKE_DEPETECTOR_PARAMS params);
 
