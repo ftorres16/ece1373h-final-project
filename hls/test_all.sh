@@ -19,6 +19,9 @@ echo "Testing..."
 ./bin/conv_batch_relu
 ./bin/conv_batch_relu_max
 ./bin/spike_deeptector
+./bin/spike_deeptector_single_run
+./bin/spike_deeptector_cumulative
+./bin/spike_deeptector_main
 ./bin/bar
 
 # Matlab NN doesn't match because softmax is not implemented in hardware
