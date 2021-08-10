@@ -1,5 +1,5 @@
-#include "../src/max_pool_2d.h"
-#include "utils.h"
+#include "../../src/layers/max_pool_2d.h"
+#include "../utils.h"
 #include <cmath>
 #include <iostream>
 #include <map>

@@ -1,6 +1,6 @@
-#include "../src/conv_batch_relu_max.h"
-#include "../src/max_pool_2d.h"
-#include "utils.h"
+#include "../../src/layers/conv_batch_relu_max.h"
+#include "../../src/layers/max_pool_2d.h"
+#include "../utils.h"
 #include <cmath>
 #include <iostream>
 #include <map>

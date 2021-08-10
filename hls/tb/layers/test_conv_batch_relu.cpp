@@ -1,5 +1,5 @@
-#include "../src/conv_batch_relu.h"
-#include "utils.h"
+#include "../../src/layers/conv_batch_relu.h"
+#include "../utils.h"
 #include <cmath>
 #include <iostream>
 #include <map>

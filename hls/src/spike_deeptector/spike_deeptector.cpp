@@ -1,8 +1,9 @@
-#include "conv.h"
-#include "conv_batch_relu.h"
-#include "conv_batch_relu_max.h"
-#include "conv_relu.h"
-#include "zero_mean.h"
+#include "spike_deeptector.h"
+#include "../layers/conv.h"
+#include "../layers/conv_batch_relu.h"
+#include "../layers/conv_batch_relu_max.h"
+#include "../layers/conv_relu.h"
+#include "../layers/zero_mean.h"
 
 /*
  * Write the input into `mem_0`, then read it from `mem_1`.
@@ -11,7 +12,7 @@
 
 void spike_deeptector(float *mem, const int params_offset,
                       const int mem_0_offset, const int mem_1_offset,
-                      const int b, const int ix, const int iy) {
+                      const SPIKE_DEPETECTOR_PARAMS params) {
 
   int params_offset_0, params_offset_1, params_offset_2, params_offset_3,
       params_offset_4, params_offset_5, params_offset_6, params_offset_fc_1,
@@ -30,9 +31,9 @@ void spike_deeptector(float *mem, const int params_offset,
   conv_stack_0.ky = 1;
   conv_stack_0.px = 1;
   conv_stack_0.py = 0;
-  conv_stack_0.b = b;
-  conv_stack_0.ix = ix;
-  conv_stack_0.iy = iy;
+  conv_stack_0.b = params.b;
+  conv_stack_0.ix = params.ix;
+  conv_stack_0.iy = params.iy;
   get_conv_out_dims(&conv_stack_0);
 
   conv_stack_1.id = 25;
