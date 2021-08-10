@@ -1,5 +1,5 @@
-#include "../src/layers/fc.h"
-#include "utils.h"
+#include "../../src/layers/fc.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 #include <string>

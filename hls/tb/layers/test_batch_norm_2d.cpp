@@ -1,5 +1,5 @@
-#include "../src/layers/batch_norm_2d.h"
-#include "utils.h"
+#include "../../src/layers/batch_norm_2d.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 #include <string>

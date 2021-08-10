@@ -17,9 +17,6 @@ typedef struct CONV_LAYER_PARAMS {
   int oy; // output height
 } CONV_LAYER_PARAMS;
 
-typedef struct CONV_LAYER_OUT_DIMS {
-} CONV_LAYER_OUT_DIMS;
-
 void conv_layer(float *mem,              // global memory pointer
                 const int params_offset, // offset of parameters
                 const int input_offset,  // offset of inputs

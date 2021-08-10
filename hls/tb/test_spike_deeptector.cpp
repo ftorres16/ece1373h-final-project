@@ -31,11 +31,13 @@ int main() {
   int params_offset = 0;
   int mem_0_offset = params_offset + num_params * sizeof(float);
   int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
-  int b = 1;
-  int ix = 48;
-  int iy = 20;
+  SPIKE_DEPETECTOR_PARAMS params;
 
-  spike_deeptector(mem, params_offset, mem_0_offset, mem_1_offset, b, ix, iy);
+  params.b = 1;
+  params.ix = 48;
+  params.iy = 20;
+
+  spike_deeptector(mem, params_offset, mem_0_offset, mem_1_offset, params);
 
   int error_count = 0;
   bool flag = false;

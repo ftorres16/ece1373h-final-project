@@ -1,5 +1,5 @@
-#include "../src/layers/zero_mean.h"
-#include "utils.h"
+#include "../../src/layers/zero_mean.h"
+#include "../utils.h"
 #include <iostream>
 #include <map>
 #include <string>

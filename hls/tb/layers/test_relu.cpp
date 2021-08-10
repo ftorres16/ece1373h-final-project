@@ -1,5 +1,5 @@
-#include "../src/layers/relu.h"
-#include "utils.h"
+#include "../../src/layers/relu.h"
+#include "../utils.h"
 #include <cmath>
 #include <iostream>
 #include <map>
