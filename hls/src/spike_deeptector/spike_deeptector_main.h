@@ -5,7 +5,7 @@
 
 void spike_deeptector_main(float *mem,
                            const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
-                           const int in_offset, int *output_labels,
-                           int *n_neural_channels, const int n_electrodes,
-                           const int b);
+                           const int n_electrodes, const int *electrodes_offset,
+                           int *n_neural_channels, int *output_labels);
+
 #endif

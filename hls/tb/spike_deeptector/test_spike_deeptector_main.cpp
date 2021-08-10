@@ -35,14 +35,19 @@ int main() {
       mem_params.params_offset + num_params * sizeof(float);
   mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
 
-  int b = 1, n_electrodes = 1;
+  int n_electrodes = 1;
+  int electrodes_offset[] = {
+      mem_params.mem_0_offset,
+      mem_params.mem_0_offset +
+          int(48 * 20 * sizeof(float)) // adding input length
+  };
 
   int n_neural_channels = 0;
   int output_labels[n_electrodes];
   int output_labels_gold[] = {};
 
-  spike_deeptector_main(mem, mem_params, mem_params.mem_0_offset, output_labels,
-                        &n_neural_channels, n_electrodes, b);
+  spike_deeptector_main(mem, mem_params, n_electrodes, electrodes_offset,
+                        &n_neural_channels, output_labels);
 
   int error_count = 0;
   bool flag = false;
