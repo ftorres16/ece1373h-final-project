@@ -36,6 +36,7 @@ class GenSpikeDeeptector(GenLoadWeightsBase):
         # self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
         self.input_ = torch.zeros(batch_size, in_d, in_y, in_x)
 
+
     def gen_output(self):
         self.model.eval()
         self.output = self.model(self.input_)
@@ -66,33 +67,6 @@ class GenSpikeDeeptector(GenLoadWeightsBase):
 
         return outputs
 
-    def _get_model_params(self) -> T.List[torch.tensor]:
-        """
-        Get all model params as a list.
-        """
-        params = []
-
-        for idx, layer in enumerate(self.model.layers):
-            if isinstance(layer, ZeroMean):
-                params.append(layer.mean)
-            elif isinstance(layer, nn.Conv2d):
-                params.append(layer.weight)
-                params.append(layer.bias)
-            elif isinstance(layer, nn.BatchNorm2d):
-                params.append(layer.running_mean)
-                params.append(layer.running_var)
-                params.append(
-                    layer.weight
-                    if layer.weight is not None
-                    else torch.tensor([1.0] * layer.num_features)
-                )
-                params.append(
-                    layer.bias
-                    if layer.bias is not None
-                    else torch.tensor([0.0] * layer.num_features)
-                )
-
-        return params
 
     def _gen_mem_pre(self):
         """
