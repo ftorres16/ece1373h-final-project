@@ -43,8 +43,8 @@ int main() {
   int n_spikes_gold = 1;
   int spikes_offset_gold[] = {mem_params.mem_0_offset};
 
-  bar_main(mem, mem_params, n_samples, samples_offset, spikes_offset,
-           &n_spikes);
+  bar_main(mem, mem_params, n_samples, samples_offset, &n_spikes,
+           spikes_offset);
 
   if (n_spikes != n_spikes_gold) {
     cout << "ERROR when comoparing n_spikes. Expected: " << n_spikes_gold

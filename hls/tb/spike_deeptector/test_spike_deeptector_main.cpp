@@ -43,11 +43,11 @@ int main() {
   };
 
   int n_neural_channels = 0;
-  int output_labels[n_electrodes];
-  int output_labels_gold[] = {};
+  int neural_channels[n_electrodes];
+  int neural_channels_gold[] = {};
 
   spike_deeptector_main(mem, mem_params, n_electrodes, electrodes_offset,
-                        &n_neural_channels, output_labels);
+                        &n_neural_channels, neural_channels);
 
   int error_count = 0;
   bool flag = false;
@@ -83,11 +83,11 @@ int main() {
   }
 
   for (int i = 0; i < n_neural_channels; i++) {
-    if (output_labels[i] != output_labels_gold[i]) {
+    if (neural_channels[i] != neural_channels_gold[i]) {
       passed = false;
-      cout << "ERROR when comparing output_labels[" << i
-           << "]. Expected: " << output_labels_gold[i]
-           << " Got: " << output_labels[i] << endl;
+      cout << "ERROR when comparing neural_channels[" << i
+           << "]. Expected: " << neural_channels_gold[i]
+           << " Got: " << neural_channels[i] << endl;
     }
   }
 

@@ -5,7 +5,7 @@
 void spike_deeptector_main(float *mem,
                            const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
                            const int n_electrodes, const int *electrodes_offset,
-                           int *n_neural_channels, int *output_labels) {
+                           int *n_neural_channels, int *neural_channels) {
 
   /*
    * `electrodes_offset` is an array of length `n_electrodes + 1` with where the
@@ -51,7 +51,7 @@ void spike_deeptector_main(float *mem,
 
     // Store only the spike neural channels
     if (channel_labels[i] == 0 && channel_scores[i] > threshold) {
-      output_labels[*n_neural_channels] = i;
+      neural_channels[*n_neural_channels] = i;
       (*n_neural_channels)++;
     }
   }
