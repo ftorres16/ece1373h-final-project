@@ -17,7 +17,7 @@ void spike_deeptector_main(float *mem,
   int channel_labels[n_electrodes];
   float channel_scores[n_electrodes];
 
-  SPIKE_DEPETECTOR_PARAMS params;
+  SPIKE_DEEPETECTOR_PARAMS params;
   params.b = 1;
   params.ix = 48;
   params.iy = 20;

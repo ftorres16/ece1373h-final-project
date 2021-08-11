@@ -11,7 +11,7 @@
  */
 
 void spike_deeptector(float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
-                      const SPIKE_DEPETECTOR_PARAMS params) {
+                      const SPIKE_DEEPETECTOR_PARAMS params) {
 
   int params_offset_0, params_offset_1, params_offset_2, params_offset_3,
       params_offset_4, params_offset_5, params_offset_6, params_offset_fc_1,

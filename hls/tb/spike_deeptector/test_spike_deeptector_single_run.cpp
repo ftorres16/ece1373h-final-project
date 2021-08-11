@@ -35,7 +35,7 @@ int main() {
       mem_params.params_offset + num_params * sizeof(float);
   mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
 
-  SPIKE_DEPETECTOR_PARAMS params;
+  SPIKE_DEEPETECTOR_PARAMS params;
 
   params.b = 1;
   params.ix = 48;
