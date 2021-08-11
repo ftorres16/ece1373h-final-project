@@ -28,16 +28,18 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  int params_offset = 0;
-  int mem_0_offset = params_offset + num_params * sizeof(float);
-  int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
-  SPIKE_DEPETECTOR_PARAMS params;
+  SPIKE_DEEPTECTOR_MEM_PARAMS mem_params;
+  mem_params.params_offset = 0;
+  mem_params.mem_0_offset =
+      mem_params.params_offset + num_params * sizeof(float);
+  mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
+  SPIKE_DEEPETECTOR_PARAMS params;
 
   params.b = 1;
   params.ix = 48;
   params.iy = 20;
 
-  spike_deeptector(mem, params_offset, mem_0_offset, mem_1_offset, params);
+  spike_deeptector(mem, mem_params, params);
 
   int error_count = 0;
   bool flag = false;
@@ -72,8 +74,8 @@ int main() {
     cout << "SpikeDeeptector test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
-    cout << "mem_0 offset: " << mem_0_offset / sizeof(float) << endl;
-    cout << "mem_1 offset: " << mem_1_offset / sizeof(float) << endl;
+    cout << "mem_0 offset: " << mem_params.mem_0_offset / sizeof(float) << endl;
+    cout << "mem_1 offset: " << mem_params.mem_1_offset / sizeof(float) << endl;
     return -1;
   }
 }

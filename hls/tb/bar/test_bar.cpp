@@ -1,5 +1,4 @@
-#include "../../src/spike_deeptector/spike_deeptector.h"
-#include "../../src/spike_deeptector/spike_deeptector_single_run.h"
+#include "../../src/bar/bar.h"
 #include "../utils.h"
 #include <iostream>
 #include <map>
@@ -8,12 +7,12 @@ using namespace std;
 
 int main() {
   bool passed = true;
-  string src_file = "tb_data/spike_deeptector.txt";
-  string src_pre_file = "tb_data/spike_deeptector_pre.txt";
+  string src_file = "tb_data/bar.txt";
+  string src_pre_file = "tb_data/bar_pre.txt";
 
-  int mem_len = 477587;
-  int num_params = 449587;
-  int mem_0_len = 24000;
+  int mem_len = 1929600;
+  int num_params = 1923825;
+  int mem_0_len = 2850;
 
   float *mem, *mem_gold;
 
@@ -29,22 +28,18 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  SPIKE_DEEPTECTOR_MEM_PARAMS mem_params;
+  BAR_MEM_PARAMS mem_params;
   mem_params.params_offset = 0;
   mem_params.mem_0_offset =
       mem_params.params_offset + num_params * sizeof(float);
   mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
 
-  SPIKE_DEEPETECTOR_PARAMS params;
-
+  BAR_PARAMS params;
   params.b = 1;
   params.ix = 48;
-  params.iy = 20;
+  params.iy = 1;
 
-  int out[params.b];
-  int out_gold[params.b] = {1};
-
-  spike_deeptector_single_run(mem, mem_params, out, params);
+  bar(mem, mem_params, params);
 
   int error_count = 0;
   bool flag = false;
@@ -73,22 +68,14 @@ int main() {
   free(mem);
   free(mem_gold);
 
-  // check output
-  for (int i = 0; i < params.b; i++) {
-    if (out[i] != out_gold[i]) {
-      cout << "Error when comparing out[" << i << "]. Expeted: " << out_gold[i]
-           << " Got: " << out[i] << endl;
-    }
-  }
-
   if (passed) {
-    cout << "SpikeDeeptector single run test successful. :)" << endl;
+    cout << "BAR test successful. :)" << endl;
   } else {
-    cout << "SpikeDeeptector single run test failed :(" << endl;
+    cout << "BAR test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
-    cout << "mem_0 offset: " << mem_params.mem_0_offset / sizeof(float) << endl;
-    cout << "mem_1 offset: " << mem_params.mem_1_offset / sizeof(float) << endl;
+    cout << "mem_0_offset: " << mem_params.mem_0_offset / sizeof(float) << endl;
+    cout << "mem_1_offset: " << mem_params.mem_1_offset / sizeof(float) << endl;
     return -1;
   }
 }

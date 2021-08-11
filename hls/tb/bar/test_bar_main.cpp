@@ -1,7 +1,7 @@
-#include "../src/bar.h"
-#include "utils.h"
+#include "../../src/bar/bar.h"
+#include "../../src/bar/bar_main.h"
+#include "../utils.h"
 #include <iostream>
-#include <map>
 
 using namespace std;
 
@@ -28,14 +28,36 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  int params_offset = 0;
-  int mem_0_offset = params_offset + num_params * sizeof(float);
-  int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
-  int b = 1;
-  int ix = 48;
-  int iy = 1;
+  BAR_MEM_PARAMS mem_params;
+  mem_params.params_offset = 0;
+  mem_params.mem_0_offset =
+      mem_params.params_offset + num_params * sizeof(float);
+  mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
 
-  bar(mem, params_offset, mem_0_offset, mem_1_offset, b, ix, iy);
+  int n_samples = 1;
+  int samples_offset[] = {mem_params.mem_0_offset};
+
+  int n_spikes;
+  int spikes_offset[n_samples];
+
+  int n_spikes_gold = 1;
+  int spikes_offset_gold[] = {mem_params.mem_0_offset};
+
+  bar_main(mem, mem_params, n_samples, samples_offset, &n_spikes,
+           spikes_offset);
+
+  if (n_spikes != n_spikes_gold) {
+    cout << "ERROR when comoparing n_spikes. Expected: " << n_spikes_gold
+         << " Got: " << n_spikes << endl;
+  }
+
+  for (int i = 0; i < n_spikes; i++) {
+    if (spikes_offset[i] != spikes_offset_gold[i]) {
+      cout << "ERROR when comoparing spikes_offset[" << i
+           << "]. Expected: " << spikes_offset_gold[i]
+           << " Got: " << spikes_offset[i] << endl;
+    }
+  }
 
   int error_count = 0;
   bool flag = false;
@@ -65,13 +87,13 @@ int main() {
   free(mem_gold);
 
   if (passed) {
-    cout << "BAR test successful. :)" << endl;
+    cout << "BAR main test successful. :)" << endl;
   } else {
-    cout << "BAR test failed :(" << endl;
+    cout << "BAR main test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
-    cout << "mem_0_offset: " << mem_0_offset / sizeof(float) << endl;
-    cout << "mem_1_offset: " << mem_1_offset / sizeof(float) << endl;
+    cout << "mem_0_offset: " << mem_params.mem_0_offset / sizeof(float) << endl;
+    cout << "mem_1_offset: " << mem_params.mem_1_offset / sizeof(float) << endl;
     return -1;
   }
 }

@@ -23,6 +23,7 @@ echo "Testing..."
 ./bin/spike_deeptector_cumulative
 ./bin/spike_deeptector_main
 ./bin/bar
+./bin/bar_main
 
 # Matlab NN doesn't match because softmax is not implemented in hardware
 # ./bin/matlab_nn

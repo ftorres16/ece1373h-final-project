@@ -1,16 +1,16 @@
-#include "layers/conv.h"
-#include "layers/conv_batch_relu.h"
-#include "layers/conv_batch_relu_max.h"
-#include "layers/conv_relu.h"
-#include "layers/zero_mean.h"
+#include "bar.h"
+#include "../layers/conv.h"
+#include "../layers/conv_batch_relu.h"
+#include "../layers/conv_batch_relu_max.h"
+#include "../layers/conv_relu.h"
+#include "../layers/zero_mean.h"
 
 /*
  * Write the input into `mem_0`, then read it from `mem_1`.
  * Be careful about the sizes of memory.
  */
 
-void bar(float *mem, const int params_offset, const int mem_0_offset,
-         const int mem_1_offset, const int b, const int ix, const int iy) {
+void bar(float *mem, const BAR_MEM_PARAMS mem_params, const BAR_PARAMS params) {
 
   int params_offset_0, params_offset_1, params_offset_2, params_offset_3,
       params_offset_fc_1, params_offset_fc_2, params_offset_fc_3;
@@ -27,9 +27,9 @@ void bar(float *mem, const int params_offset, const int mem_0_offset,
   conv_stack_0.ky = 1;
   conv_stack_0.px = 1;
   conv_stack_0.py = 0;
-  conv_stack_0.b = b;
-  conv_stack_0.ix = ix;
-  conv_stack_0.iy = iy;
+  conv_stack_0.b = params.b;
+  conv_stack_0.ix = params.ix;
+  conv_stack_0.iy = params.iy;
   get_conv_out_dims(&conv_stack_0);
 
   conv_stack_1.id = 50;
@@ -103,7 +103,7 @@ void bar(float *mem, const int params_offset, const int mem_0_offset,
   get_conv_out_dims(&conv_fc_3);
 
   // Memory layout
-  params_offset_0 = params_offset;
+  params_offset_0 = mem_params.params_offset;
   params_offset_1 =
       params_offset_0 + conv_stack_0.ix * conv_stack_0.iy * sizeof(float);
   params_offset_2 =
@@ -121,24 +121,27 @@ void bar(float *mem, const int params_offset, const int mem_0_offset,
       params_offset_fc_2 + get_conv_num_params(conv_fc_2) * sizeof(float);
 
   // Neural netowrk computation
-  zero_mean_layer(mem, params_offset_0, mem_0_offset, mem_1_offset,
-                  conv_stack_0.b, conv_stack_0.id, conv_stack_0.ix,
-                  conv_stack_0.iy);
+  zero_mean_layer(mem, params_offset_0, mem_params.mem_0_offset,
+                  mem_params.mem_1_offset, conv_stack_0.b, conv_stack_0.id,
+                  conv_stack_0.ix, conv_stack_0.iy);
 
-  conv_batch_relu_layer(mem, params_offset_1, mem_1_offset, mem_0_offset,
-                        conv_stack_0);
+  conv_batch_relu_layer(mem, params_offset_1, mem_params.mem_1_offset,
+                        mem_params.mem_0_offset, conv_stack_0);
 
-  conv_batch_relu_max_layer(mem, params_offset_2, mem_0_offset, mem_1_offset,
-                            conv_stack_1, max_pool_stack_0);
+  conv_batch_relu_max_layer(mem, params_offset_2, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_1,
+                            max_pool_stack_0);
 
-  conv_batch_relu_max_layer(mem, params_offset_3, mem_0_offset, mem_1_offset,
-                            conv_stack_2, max_pool_stack_1);
+  conv_batch_relu_max_layer(mem, params_offset_3, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_2,
+                            max_pool_stack_1);
 
-  conv_relu_layer(mem, params_offset_fc_1, mem_0_offset, mem_1_offset,
-                  conv_fc_1);
+  conv_relu_layer(mem, params_offset_fc_1, mem_params.mem_0_offset,
+                  mem_params.mem_1_offset, conv_fc_1);
 
-  conv_relu_layer(mem, params_offset_fc_2, mem_1_offset, mem_0_offset,
-                  conv_fc_2);
+  conv_relu_layer(mem, params_offset_fc_2, mem_params.mem_1_offset,
+                  mem_params.mem_0_offset, conv_fc_2);
 
-  conv_layer(mem, params_offset_fc_3, mem_0_offset, mem_1_offset, conv_fc_3);
+  conv_layer(mem, params_offset_fc_3, mem_params.mem_0_offset,
+             mem_params.mem_1_offset, conv_fc_3);
 }

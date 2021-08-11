@@ -10,9 +10,8 @@
  * Be careful about the sizes of memory.
  */
 
-void spike_deeptector(float *mem, const int params_offset,
-                      const int mem_0_offset, const int mem_1_offset,
-                      const SPIKE_DEPETECTOR_PARAMS params) {
+void spike_deeptector(float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
+                      const SPIKE_DEEPETECTOR_PARAMS params) {
 
   int params_offset_0, params_offset_1, params_offset_2, params_offset_3,
       params_offset_4, params_offset_5, params_offset_6, params_offset_fc_1,
@@ -146,7 +145,7 @@ void spike_deeptector(float *mem, const int params_offset,
   get_conv_out_dims(&conv_fc_2);
 
   // Memory layout
-  params_offset_0 = params_offset;
+  params_offset_0 = mem_params.params_offset;
   params_offset_1 =
       params_offset_0 + conv_stack_0.ix * conv_stack_0.iy * sizeof(float);
   params_offset_2 =
@@ -171,30 +170,36 @@ void spike_deeptector(float *mem, const int params_offset,
       params_offset_fc_1 + get_conv_num_params(conv_fc_1) * sizeof(float);
 
   // Neural network computation
-  zero_mean_layer(mem, params_offset_0, mem_0_offset, mem_1_offset,
-                  conv_stack_0.b, conv_stack_0.id, conv_stack_0.ix,
-                  conv_stack_0.iy);
+  zero_mean_layer(mem, params_offset_0, mem_params.mem_0_offset,
+                  mem_params.mem_1_offset, conv_stack_0.b, conv_stack_0.id,
+                  conv_stack_0.ix, conv_stack_0.iy);
 
-  conv_batch_relu_layer(mem, params_offset_1, mem_1_offset, mem_0_offset,
-                        conv_stack_0);
+  conv_batch_relu_layer(mem, params_offset_1, mem_params.mem_1_offset,
+                        mem_params.mem_0_offset, conv_stack_0);
 
-  conv_batch_relu_max_layer(mem, params_offset_2, mem_0_offset, mem_1_offset,
-                            conv_stack_1, max_pool_stack_1);
+  conv_batch_relu_max_layer(mem, params_offset_2, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_1,
+                            max_pool_stack_1);
 
-  conv_batch_relu_max_layer(mem, params_offset_3, mem_0_offset, mem_1_offset,
-                            conv_stack_2, max_pool_stack_2);
+  conv_batch_relu_max_layer(mem, params_offset_3, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_2,
+                            max_pool_stack_2);
 
-  conv_batch_relu_max_layer(mem, params_offset_4, mem_0_offset, mem_1_offset,
-                            conv_stack_3, max_pool_stack_3);
+  conv_batch_relu_max_layer(mem, params_offset_4, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_3,
+                            max_pool_stack_3);
 
-  conv_batch_relu_max_layer(mem, params_offset_5, mem_0_offset, mem_1_offset,
-                            conv_stack_4, max_pool_stack_4);
+  conv_batch_relu_max_layer(mem, params_offset_5, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_4,
+                            max_pool_stack_4);
 
-  conv_batch_relu_max_layer(mem, params_offset_6, mem_0_offset, mem_1_offset,
-                            conv_stack_5, max_pool_stack_5);
+  conv_batch_relu_max_layer(mem, params_offset_6, mem_params.mem_0_offset,
+                            mem_params.mem_1_offset, conv_stack_5,
+                            max_pool_stack_5);
 
-  conv_relu_layer(mem, params_offset_fc_1, mem_0_offset, mem_1_offset,
-                  conv_fc_1);
+  conv_relu_layer(mem, params_offset_fc_1, mem_params.mem_0_offset,
+                  mem_params.mem_1_offset, conv_fc_1);
 
-  conv_layer(mem, params_offset_fc_2, mem_1_offset, mem_0_offset, conv_fc_2);
+  conv_layer(mem, params_offset_fc_2, mem_params.mem_1_offset,
+             mem_params.mem_0_offset, conv_fc_2);
 }

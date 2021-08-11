@@ -29,19 +29,25 @@ int main() {
     mem[i] = mem_gold[i];
   }
 
-  int params_offset = 0;
-  int mem_0_offset = params_offset + num_params * sizeof(float);
-  int mem_1_offset = mem_0_offset + mem_0_len * sizeof(float);
+  SPIKE_DEEPTECTOR_MEM_PARAMS mem_params;
+  mem_params.params_offset = 0;
+  mem_params.mem_0_offset =
+      mem_params.params_offset + num_params * sizeof(float);
+  mem_params.mem_1_offset = mem_params.mem_0_offset + mem_0_len * sizeof(float);
 
-  int b = 1, n_electrodes = 1;
+  int n_electrodes = 1;
+  int electrodes_offset[] = {
+      mem_params.mem_0_offset,
+      mem_params.mem_0_offset +
+          int(48 * 20 * sizeof(float)) // adding input length
+  };
 
   int n_neural_channels = 0;
-  int output_labels[n_electrodes];
-  int output_labels_gold[] = {};
+  int neural_channels[n_electrodes];
+  int neural_channels_gold[] = {};
 
-  spike_deeptector_main(mem, params_offset, mem_0_offset, mem_1_offset,
-                        mem_0_offset, output_labels, &n_neural_channels,
-                        n_electrodes, b);
+  spike_deeptector_main(mem, mem_params, n_electrodes, electrodes_offset,
+                        &n_neural_channels, neural_channels);
 
   int error_count = 0;
   bool flag = false;
@@ -77,11 +83,11 @@ int main() {
   }
 
   for (int i = 0; i < n_neural_channels; i++) {
-    if (output_labels[i] != output_labels_gold[i]) {
+    if (neural_channels[i] != neural_channels_gold[i]) {
       passed = false;
-      cout << "ERROR when comparing output_labels[" << i
-           << "]. Expected: " << output_labels_gold[i]
-           << " Got: " << output_labels[i] << endl;
+      cout << "ERROR when comparing neural_channels[" << i
+           << "]. Expected: " << neural_channels_gold[i]
+           << " Got: " << neural_channels[i] << endl;
     }
   }
 
@@ -91,8 +97,8 @@ int main() {
     cout << "SpikeDeeptector main test failed :(" << endl;
     cout << "First failed index: " << first_failed_idx << endl;
     cout << "Found " << error_count << " mismatching entries." << endl;
-    cout << "mem_0 offset: " << mem_0_offset / sizeof(float) << endl;
-    cout << "mem_1 offset: " << mem_1_offset / sizeof(float) << endl;
+    cout << "mem_0 offset: " << mem_params.mem_0_offset / sizeof(float) << endl;
+    cout << "mem_1 offset: " << mem_params.mem_1_offset / sizeof(float) << endl;
     return -1;
   }
 }
