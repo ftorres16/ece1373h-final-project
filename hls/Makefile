@@ -48,6 +48,9 @@ $(OUT_FOLDER)/spike_deeptector_main: test_spike_deeptector_main.cpp utils.cpp ut
 $(OUT_FOLDER)/bar: test_bar.cpp utils.cpp utils.h conv.cpp conv.h conv_relu.cpp conv_relu.h batch_norm_2d.cpp batch_norm_2d.h max_pool_2d.cpp max_pool_2d.h conv_batch_relu.h conv_batch_relu.cpp conv_batch_relu_max.cpp conv_batch_relu_max.h zero_mean.h zero_mean.cpp bar.cpp bar.h
 	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
 
+$(OUT_FOLDER)/bar_main: test_bar_main.cpp utils.cpp utils.h conv.cpp conv.h conv_relu.cpp conv_relu.h batch_norm_2d.cpp batch_norm_2d.h max_pool_2d.cpp max_pool_2d.h conv_batch_relu.h conv_batch_relu.cpp conv_batch_relu_max.cpp conv_batch_relu_max.h zero_mean.h zero_mean.cpp bar.cpp bar.h bar_main.cpp bar_main.h
+	$(CXX) $(CFLAGS) $^ $(LDFLAGS) -o $@
+
 .PHONY: clean
 clean:
 	rm $(OUT_FOLDER)/*
