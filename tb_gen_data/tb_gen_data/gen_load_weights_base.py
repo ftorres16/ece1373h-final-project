@@ -20,13 +20,21 @@ class GenLoadWeightsBase(GenBase):
 
         self.mem_weights_file = mem_weights_file
 
-    def _load_mem_file(self):
-        with open(f"{self.out_folder}/{self.mem_weights_file}") as f:
+    def _load_mem_file(
+        self, mem_weights_file: T.Optional[str] = None, model: nn.Module = None
+    ):
+        if mem_weights_file is None:
+            mem_weights_file = self.mem_weights_file
+
+        if model is None:
+            model = self.model
+
+        with open(f"{self.out_folder}/{mem_weights_file}") as f:
             mem = [float(line.strip()) for line in f.readlines()]
 
         from_idx = 0
         to_idx = 0
-        for layer in self.model.layers:
+        for layer in model.layers:
             from_idx = to_idx
 
             if isinstance(layer, ZeroMean):
@@ -92,3 +100,36 @@ class GenLoadWeightsBase(GenBase):
         setattr(layer, param, param_tensor)
 
         return to_idx
+
+    def _get_model_params(
+        self, model: T.Optional[nn.Module] = None
+    ) -> T.List[torch.tensor]:
+        """
+        Get all model params as a list.
+        """
+        if model is None:
+            model = self.model
+
+        params = []
+
+        for idx, layer in enumerate(model.layers):
+            if isinstance(layer, ZeroMean):
+                params.append(layer.mean)
+            elif isinstance(layer, nn.Conv2d):
+                params.append(layer.weight)
+                params.append(layer.bias)
+            elif isinstance(layer, nn.BatchNorm2d):
+                params.append(layer.running_mean)
+                params.append(layer.running_var)
+                params.append(
+                    layer.weight
+                    if layer.weight is not None
+                    else torch.tensor([1.0] * layer.num_features)
+                )
+                params.append(
+                    layer.bias
+                    if layer.bias is not None
+                    else torch.tensor([0.0] * layer.num_features)
+                )
+
+        return params
