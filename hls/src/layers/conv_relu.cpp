@@ -5,6 +5,17 @@
 void conv_relu_layer(float *mem, const int params_offset,
                      const int input_offset, const int output_offset,
                      CONV_LAYER_PARAMS params) {
+  // clang-format off
+
+	// Global memory interface
+	#pragma HLS INTERFACE m_axi port=mem depth=68 //update number
+	// Bind all control ports to a single bundle
+	#pragma HLS INTERFACE s_axilite port=params_offset bundle=CTRL_BUS
+	#pragma HLS INTERFACE s_axilite port=input_offset bundle=CTRL_BUS
+	#pragma HLS INTERFACE s_axilite port=output_offset bundle=CTRL_BUS
+	#pragma HLS INTERFACE s_axilite port=return bundle=CTRL_BUS
+
+  // clang-format on
 
   int num_conv_weights = get_conv_num_weights(params);
 
