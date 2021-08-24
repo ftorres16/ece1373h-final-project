@@ -17,7 +17,7 @@ add_files -tb ../hls/tb/utils.h
 open_solution "solution1"
 set_part {xc7z030sbg485-1} -tool vivado
 create_clock -period 10 -name default
-#source "./conv_layer/solution1/directives.tcl"
+source "./conv_relu_layer/solution1/directives.tcl"
 csim_design
 csynth_design
 cosim_design -trace_level all

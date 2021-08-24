@@ -7,10 +7,14 @@
  * Write the input into `mem_0`, then read it from `mem_0`.
  * `mem_1` is an intermediate output.
  */
+
 void conv_batch_relu_max_layer(float *mem, const int params_offset,
                                const int mem_0_offset, const int mem_1_offset,
                                CONV_LAYER_PARAMS conv_params,
                                MAX_POOL_2D_PARAMS max_pool_params) {
+
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   conv_batch_relu_layer(mem, params_offset, mem_0_offset, mem_1_offset,
                         conv_params);
