@@ -1,4 +1,5 @@
 import typing as T
+from array import array
 
 from tb_gen_data.config import OUTPUT_FOLDER
 
@@ -9,6 +10,7 @@ class GenBase:
         self.out_folder = out_folder
 
         self.out_file = f"{out_folder}/{name}.txt"
+        self.out_bin_file = f"{out_folder}/{name}.bin"
         self.params_file = f"{out_folder}/{name}_params.txt"
 
         self.input_ = None
@@ -47,6 +49,21 @@ class GenBase:
 
         with open(self.out_file, "w") as f:
             f.writelines(self.mem)
+
+    def _gen_mem_bin(self):
+        """
+        Load the resulting memory layout from running the module in array `self.mem_bin`.
+        """
+        raise NotImplementedError("This is an abstract class.")
+
+    def write_mem_bin(self):
+        """
+        Write the memory layout from `self.mem` to a binary file in path `self.out_bin_file`.
+        """
+        self._gen_mem_bin()
+
+        with open(self.out_bin_file, "wb") as f:
+            self.mem_bin.tofile(f)
 
     def _gen_mem_pre(self):
         """

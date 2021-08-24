@@ -1,4 +1,5 @@
 import typing as T
+from array import array
 
 import torch
 import numpy as np
@@ -87,6 +88,36 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         )
         print(f"int mem_0_len = {len(torch.flatten(mem_0))};")
 
+    def _gen_mem_bin(self):
+        FLOAT_SIZE_BYTES = 4
+        BYTE_SIZE_BITS = 8
+        BIT_ALIGNMENT = 512
+
+        self.mem_bin = array("f")
+
+        # this is notn very efficient, in production you probably would want
+        # to get `self._mem_bin` first and then construct `self.mem` from it
+        mem_list = [float(entry) for entry in self.mem]
+
+        self.mem_bin.fromlist(mem_list)
+
+        # memory needs alignment to BIT_ALIGNMENT bits
+        mem_bin_size = len(self.mem_bin) * FLOAT_SIZE_BYTES * BYTE_SIZE_BITS
+        pad_bits = (
+            BIT_ALIGNMENT - mem_bin_size % BIT_ALIGNMENT
+            if mem_bin_size % BIT_ALIGNMENT != 0
+            else 0
+        )
+
+        if pad_bits % FLOAT_SIZE_BYTES * BYTE_SIZE_BITS != 0:
+            print(
+                f"Warning! Padding bits {pad_bits} can't be realized with 4 byte floats"
+            )
+
+        pad_floats = pad_bits // (FLOAT_SIZE_BYTES * BYTE_SIZE_BITS)
+
+        self.mem_bin.fromlist([0.0 for _ in range(pad_floats)])
+
 
 if __name__ == "__main__":
     torch.manual_seed(0)
@@ -97,3 +128,4 @@ if __name__ == "__main__":
     gen._load_mem_file("matlab_bar.txt", gen.bar)
     gen.gen_output()
     gen.write_mem()
+    gen.write_mem_bin()
