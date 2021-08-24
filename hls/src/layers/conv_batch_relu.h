@@ -9,4 +9,6 @@ void conv_batch_relu_layer(float *mem,              // global memory pointer
                            const int output_offset, // offset of outputs
                            CONV_LAYER_PARAMS params // conv layer params
 );
+
+#define MAX_BATCH_NORM_CHANNELS 600
 #endif
