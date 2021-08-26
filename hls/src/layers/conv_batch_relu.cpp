@@ -1,6 +1,5 @@
 #include "conv.h"
 #include <algorithm>
-#include <cmath>
 
 void conv_batch_relu_layer(float *mem, const int params_offset,
                            const int input_offset, const int output_offset,
@@ -10,14 +9,15 @@ void conv_batch_relu_layer(float *mem, const int params_offset,
   int num_conv_bias = get_conv_num_bias(params);
 
   // Load batch norm params
-  float mu[params.od], sigma[params.od], gamma[params.od], beta[params.od];
+  float mu[params.od], std_dev[params.od], gamma[params.od], beta[params.od];
   int bn_params_offset =
       params_offset / sizeof(float) + num_conv_weights + num_conv_bias;
-  float eps = 1e-5;
+  float eps = 1e-6;
 
   for (int o_d = 0; o_d < params.od; o_d++) {
     mu[o_d] = mem[bn_params_offset + o_d];
-    sigma[o_d] = mem[bn_params_offset + params.od + o_d];
+    // Look out! Using standard dev instead of sigma to avoid sqrt()
+    std_dev[o_d] = mem[bn_params_offset + params.od + o_d];
     gamma[o_d] = mem[bn_params_offset + 2 * params.od + o_d];
     beta[o_d] = mem[bn_params_offset + 3 * params.od + o_d];
   }
@@ -66,7 +66,7 @@ void conv_batch_relu_layer(float *mem, const int params_offset,
 
           // batch norm
           output_element =
-              (output_element - mu[o_d]) / sqrt(sigma[o_d] + eps) * gamma[o_d] +
+              (output_element - mu[o_d]) / (std_dev[o_d] + eps) * gamma[o_d] +
               beta[o_d];
 
           // relu

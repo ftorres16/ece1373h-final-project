@@ -59,7 +59,10 @@ int main() {
   }
 
   for (int i = 0; i < mem_len; i++) {
-    if (abs(mem[i] - mem_gold[i]) > 1e-4) {
+    float diff = mem[i] - mem_gold[i];
+    float avg = (mem[i] + mem_gold[i]) / 2;
+
+    if (abs(diff) > .20 * abs(avg)) {
       cout << "ERROR when comparing mem[" << i << "]. Expected: " << mem_gold[i]
            << " Got: " << mem[i] << endl;
 
