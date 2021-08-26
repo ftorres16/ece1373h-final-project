@@ -54,6 +54,9 @@ class GenConvBatchRelu(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
+        # run it at least once to initialize running var and mean
+        _ = self.model(self.input_)
+
         self.model.eval()
         self.output = self.model(self.input_)
 
@@ -85,7 +88,8 @@ class GenConvBatchRelu(GenBase):
             torch.flatten(self.model.conv.weight),
             self.model.conv.bias,
             self.model.batch_norm.running_mean,
-            self.model.batch_norm.running_var,
+            # store std dev instead of variance for hw efficiency
+            torch.sqrt(self.model.batch_norm.running_var),
             bn_weight,
             bn_bias,
             torch.flatten(self.input_),
@@ -104,7 +108,8 @@ class GenConvBatchRelu(GenBase):
             torch.flatten(self.model.conv.weight),
             self.model.conv.bias,
             self.model.batch_norm.running_mean,
-            self.model.batch_norm.running_var,
+            # store std dev instead of variance for hw efficiency
+            torch.sqrt(self.model.batch_norm.running_var),
             bn_weight,
             bn_bias,
             mem_0,

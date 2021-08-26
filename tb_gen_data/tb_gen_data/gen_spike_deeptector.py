@@ -36,7 +36,6 @@ class GenSpikeDeeptector(GenLoadWeightsBase):
         # self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
         self.input_ = torch.zeros(batch_size, in_d, in_y, in_x)
 
-
     def gen_output(self):
         self.model.eval()
         self.output = self.model(self.input_)
@@ -66,7 +65,6 @@ class GenSpikeDeeptector(GenLoadWeightsBase):
                 outputs.append(self.model.outputs[idx])
 
         return outputs
-
 
     def _gen_mem_pre(self):
         """

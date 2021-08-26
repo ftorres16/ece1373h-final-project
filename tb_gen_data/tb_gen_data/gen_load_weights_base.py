@@ -120,7 +120,8 @@ class GenLoadWeightsBase(GenBase):
                 params.append(layer.bias)
             elif isinstance(layer, nn.BatchNorm2d):
                 params.append(layer.running_mean)
-                params.append(layer.running_var)
+                # store std dev instead of variance for hw efficiency
+                params.append(torch.sqrt(layer.running_var))
                 params.append(
                     layer.weight
                     if layer.weight is not None

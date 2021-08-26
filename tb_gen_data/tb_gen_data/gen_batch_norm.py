@@ -21,6 +21,9 @@ class GenBatchNorm2D(GenBase):
         self.input_ = torch.randn(batch_size, in_d, in_y, in_x)
 
     def gen_output(self):
+        # run it at least once to initialize running var and mean
+        _ = self.batch_norm(self.input_)
+
         self.batch_norm.eval()
         self.output = self.batch_norm(self.input_)
 
@@ -38,7 +41,8 @@ class GenBatchNorm2D(GenBase):
 
         flat_tensors = [
             self.batch_norm.running_mean,
-            self.batch_norm.running_var,
+            # store std dev instead of variance for hw efficiency
+            torch.sqrt(self.batch_norm.running_var),
             weight,
             bias,
             torch.flatten(self.input_),

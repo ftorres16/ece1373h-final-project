@@ -59,34 +59,6 @@ class GenBAR(GenLoadWeightsBase):
 
         return outputs
 
-    def _get_model_params(self) -> T.List[torch.tensor]:
-        """
-        Get all model params as a list.
-        """
-        params = []
-
-        for idx, layer in enumerate(self.model.layers):
-            if isinstance(layer, ZeroMean):
-                params.append(layer.mean)
-            elif isinstance(layer, nn.Conv2d):
-                params.append(layer.weight)
-                params.append(layer.bias)
-            elif isinstance(layer, nn.BatchNorm2d):
-                params.append(layer.running_mean)
-                params.append(layer.running_var)
-                params.append(
-                    layer.weight
-                    if layer.weight is not None
-                    else torch.tensor([1.0] * layer.num_features)
-                )
-                params.append(
-                    layer.bias
-                    if layer.bias is not None
-                    else torch.tensor([0.0] * layer.num_features)
-                )
-
-        return params
-
     def _gen_mem_pre(self):
         """
         Get the memory before doing any computations.
