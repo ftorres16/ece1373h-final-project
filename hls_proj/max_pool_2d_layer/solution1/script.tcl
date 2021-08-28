@@ -3,7 +3,7 @@
 ## Please DO NOT edit it.
 ## Copyright (C) 1986-2019 Xilinx, Inc. All Rights Reserved.
 ############################################################
-open_project max_pool_2d
+open_project max_pool_2d_layer
 set_top max_pool_2d
 add_files ../hls/src/layers/max_pool_2d.cpp
 add_files ../hls/src/layers/max_pool_2d.h
