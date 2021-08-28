@@ -1,14 +1,16 @@
 #include "../../src/bar/bar.h"
 #include "../../src/bar/bar_main.h"
+#include "../tb_config.h"
 #include "../utils.h"
+#include <cmath>
 #include <iostream>
 
 using namespace std;
 
 int main() {
   bool passed = true;
-  string src_file = "tb_data/bar.txt";
-  string src_pre_file = "tb_data/bar_pre.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/bar.txt";
+  string src_pre_file = CPP_ROOT_PATH "tb_data/bar_pre.txt";
 
   int mem_len = 1929600;
   int num_params = 1923825;
