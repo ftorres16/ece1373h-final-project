@@ -4,6 +4,8 @@ void spike_deeptector_single_run(float *mem,
                                  const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
                                  int *out,
                                  const SPIKE_DEEPETECTOR_PARAMS params) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   /*
    * params_offset, mem_0_offset, mem_1_offset are all for the deeptector

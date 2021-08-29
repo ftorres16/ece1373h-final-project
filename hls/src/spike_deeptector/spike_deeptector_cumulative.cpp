@@ -1,5 +1,7 @@
 void spike_deeptector_cumulative(const int *in_labels, int *out_label,
                                  float *out_score, const int b) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   /*
    * Get a single label and confidence percentage for a prediction (single
