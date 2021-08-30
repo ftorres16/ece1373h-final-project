@@ -1,46 +1,51 @@
 #include "pca.h"
 
-void pca(float *mem, const int input_offset, const int output_offset, 
+void pca(float *mem, const int input_offset, const int output_offset,
          const int in_rows) {
 
-  float x_i[X_ROWS][X_COLS];                                          // Input X 
+  float x_i[X_ROWS][X_COLS]; // Input X
   float x_mean_i[X_COLS] = {0};
-  float cov_i;                                                        // FIX 
+  float cov_i; // FIX
   float s_i[X_ROWS][X_COLS];
   float u_i[X_ROWS][X_COLS];
   float v_i[X_ROWS][X_COLS];
-  float pc_i[X_ROWS][X_COLS];                                         // principal components 
+  float pc_i[X_ROWS][X_COLS]; // principal components
 
-
-  int in_addr  = input_offset / sizeof(float);
+  int in_addr = input_offset / sizeof(float);
   int out_addr = output_offset / sizeof(float);
 
-  // Copy input data from memory
-  x_row_loop: for (int r = 0; r < in_rows; r++) {
-    x_col_loop: for (int c = 0; c < X_COLS; c++) {
+// Copy input data from memory
+x_row_loop:
+  for (int r = 0; r < in_rows; r++) {
+  x_col_loop:
+    for (int c = 0; c < X_COLS; c++) {
       x_i[r][c] = mem[in_addr + r * X_COLS + c];
     }
   }
 
-  // De-mean input data: Mean is calculated column-wise.
-  x_demean_row_loop: for (int r = 0; r < in_rows; r++) {
-    x_demean_col_loop: for (int c = 0; c < X_COLS; c++) {
+// De-mean input data: Mean is calculated column-wise.
+x_demean_row_loop:
+  for (int r = 0; r < in_rows; r++) {
+  x_demean_col_loop:
+    for (int c = 0; c < X_COLS; c++) {
       x_mean_i[c] += x_i[r][c] / X_ROWS;
     }
   }
-  //   Subtract mean from each row.
-  x_sub_row_loop: for (int r = 0; r < X_ROWS; r++) {
-    x_i[r] = x_i[r] - x_mean_i[r];                                    // x_i is now de-mean-ed
+//   Subtract mean from each row.
+x_sub_row_loop:
+  for (int r = 0; r < X_ROWS; r++) {
+    x_i[r] = x_i[r] - x_mean_i[r]; // x_i is now de-mean-ed
   }
 
   // Calculate covariance matrix
-  hls::matrix_multiply<hls::Transpose, hls::NoTranspose, X_ROWS,
-                       X_COLS, X_ROWS, X_COLS, X_ROWS, X_COLS, float,
-                       float>(x_i, x_i, cov_i);
+  hls::matrix_multiply<hls::Transpose, hls::NoTranspose, X_ROWS, X_COLS, X_ROWS,
+                       X_COLS, X_ROWS, X_COLS, float, float>(x_i, x_i, cov_i);
 
-  //   Divide by in_rows - 1
-  x_cov_row_loop: for (int r = 0; r < X_COLS; r++) {
-    x_cov_col_loop: for (int c = 0; c < X_COLS; c++) {
+//   Divide by in_rows - 1
+x_cov_row_loop:
+  for (int r = 0; r < X_COLS; r++) {
+  x_cov_col_loop:
+    for (int c = 0; c < X_COLS; c++) {
       cov_i[r][c] = cov[r][c] / (in_rows - 1);
     }
   }
@@ -50,14 +55,16 @@ void pca(float *mem, const int input_offset, const int output_offset,
 
   // Get principal components
   // From SVD: X = SUV'
-  hls::matrix_multiply<hls::NoTranspose, hls::NoTranspose, X_ROWS,
-                       X_COLS, X_ROWS, X_COLS, X_ROWS, X_COLS, float,
-                       float>(x_i, u_i, pc_i);
+  hls::matrix_multiply<hls::NoTranspose, hls::NoTranspose, X_ROWS, X_COLS,
+                       X_ROWS, X_COLS, X_ROWS, X_COLS, float, float>(x_i, u_i,
+                                                                     pc_i);
 
-  // Copy output data to memory
-  pc_row_loop: for (int r = 0; r < X_ROWS; r++) {
-    pc_col_loop: for (int c = 0; c < X_COLS; c++) {
-    mem[out_addr + r * X_COLS + c] = pc_i[r][c];
+// Copy output data to memory
+pc_row_loop:
+  for (int r = 0; r < X_ROWS; r++) {
+  pc_col_loop:
+    for (int c = 0; c < X_COLS; c++) {
+      mem[out_addr + r * X_COLS + c] = pc_i[r][c];
     }
   }
 }
