@@ -1,0 +1,12 @@
+# ignore everything
+/**
+
+# but not folders
+!*/
+
+# and not gitignore
+!.gitignore
+
+# only version files needed to recreate the project
+!**/script.tcl
+!**/directives.tcl

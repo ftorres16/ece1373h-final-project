@@ -1,3 +1,5 @@
+#include "spike_deeptector_main.h"
+#include "../config.h"
 #include "spike_deeptector.h"
 #include "spike_deeptector_cumulative.h"
 #include "spike_deeptector_single_run.h"
@@ -6,6 +8,8 @@ void spike_deeptector_main(float *mem,
                            const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
                            const int n_electrodes, const int *electrodes_offset,
                            int *n_neural_channels, int *neural_channels) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   /*
    * `electrodes_offset` is an array of length `n_electrodes + 1` with where the
@@ -14,8 +18,10 @@ void spike_deeptector_main(float *mem,
 
   float threshold = 0.85;
 
-  int channel_labels[n_electrodes];
-  float channel_scores[n_electrodes];
+  int channel_labels[MAX_DEEPTECTOR_ELECTRODES];
+  float channel_scores[MAX_DEEPTECTOR_ELECTRODES];
+
+  int single_run_labels[MAX_DEEPTECTOR_SAMPLES];
 
   SPIKE_DEEPETECTOR_PARAMS params;
   params.b = 1;
@@ -29,7 +35,6 @@ void spike_deeptector_main(float *mem,
 
     int n_batches = (electrodes_offset[i + 1] - electrodes_offset[i]) /
                     (sizeof(float) * params.ix * params.iy);
-    int single_run_labels[n_batches];
 
     for (int b_ = 0; b_ < n_batches; b_++) {
 

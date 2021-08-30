@@ -1,5 +1,7 @@
 #include "../../src/layers/zero_mean.h"
+#include "../tb_config.h"
 #include "../utils.h"
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <string>
@@ -9,8 +11,8 @@ using namespace std;
 int main() {
   bool success = true;
 
-  string src_file = "tb_data/zero_mean.txt";
-  string src_params = "tb_data/zero_mean_params.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/zero_mean.txt";
+  string src_params = CPP_ROOT_PATH "tb_data/zero_mean_params.txt";
 
   map<string, int> params = read_params(src_params);
 
@@ -51,7 +53,7 @@ int main() {
                   iy);
 
   for (int i = 0; i < mem_len; i++) {
-    if (abs(mem_gold[i] - mem[i]) > 0.1 * abs(mem[i])) {
+    if (abs(mem[i] - mem_gold[i]) > abs(mem_gold[i]) * 0.01) {
       success = false;
       cout << "Error when comparing mem[" << i << "]. Expected: " << mem_gold[i]
            << " Got: " << mem[i] << endl;

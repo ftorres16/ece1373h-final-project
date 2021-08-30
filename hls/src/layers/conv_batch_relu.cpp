@@ -1,15 +1,19 @@
+#include "conv_batch_relu.h"
 #include "conv.h"
 #include <algorithm>
 
 void conv_batch_relu_layer(float *mem, const int params_offset,
                            const int input_offset, const int output_offset,
-                           CONV_LAYER_PARAMS params) {
+                           const CONV_LAYER_PARAMS params) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   int num_conv_weights = get_conv_num_weights(params);
   int num_conv_bias = get_conv_num_bias(params);
 
   // Load batch norm params
-  float mu[params.od], std_dev[params.od], gamma[params.od], beta[params.od];
+  float mu[MAX_BATCH_NORM_CHANNELS], std_dev[MAX_BATCH_NORM_CHANNELS],
+      gamma[MAX_BATCH_NORM_CHANNELS], beta[MAX_BATCH_NORM_CHANNELS];
   int bn_params_offset =
       params_offset / sizeof(float) + num_conv_weights + num_conv_bias;
   float eps = 1e-6;

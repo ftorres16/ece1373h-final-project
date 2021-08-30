@@ -6,6 +6,8 @@
 void max_pool_2d(float *mem, // global memory pointer
                  const int input_offset, const int output_offset,
                  MAX_POOL_2D_PARAMS params) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   for (int b_ = 0; b_ < params.b; b_++) {
     for (int o_d = 0; o_d < params.id; o_d++) {

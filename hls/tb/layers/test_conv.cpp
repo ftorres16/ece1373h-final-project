@@ -1,4 +1,5 @@
 #include "../../src/layers/conv.h"
+#include "../tb_config.h"
 #include "../utils.h"
 #include <cmath>
 #include <iostream>
@@ -10,8 +11,8 @@ using namespace std;
 int main() {
   bool passed = true;
 
-  string src_file = "tb_data/conv.txt";
-  string src_params = "tb_data/conv_params.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/conv.txt";
+  string src_params = CPP_ROOT_PATH "tb_data/conv_params.txt";
 
   CONV_LAYER_PARAMS params;
   map<string, int> f_params = read_params(src_params);

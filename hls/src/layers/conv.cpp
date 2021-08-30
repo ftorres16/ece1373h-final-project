@@ -3,11 +3,13 @@
 #include <cmath>
 
 void conv_layer(float *mem,               // global memory pointer
-                const int params_offset,  // ofset of parameters
+                const int params_offset,  // offset of parameters
                 const int input_offset,   // offset of inputs
                 const int output_offset,  // offset of outputs
                 CONV_LAYER_PARAMS params) // padding y
 {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   int num_weights = get_conv_num_weights(params);
   // int num_input = b * id * ix * iy;
@@ -43,7 +45,7 @@ void conv_layer(float *mem,               // global memory pointer
                               i_d * params.ix * params.iy + i_y * params.ix +
                               i_x;
 
-                // accomodate for padding
+                // accommodate for padding
                 float in_val = (i_x >= 0 && i_x < params.ix) &&
                                        (i_y >= 0 && i_y < params.iy)
                                    ? mem[in_addr]

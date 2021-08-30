@@ -1,5 +1,7 @@
 #include "../../src/spike_deeptector/spike_deeptector.h"
+#include "../tb_config.h"
 #include "../utils.h"
+#include <cmath>
 #include <iostream>
 #include <map>
 
@@ -7,8 +9,8 @@ using namespace std;
 
 int main() {
   bool passed = true;
-  string src_file = "tb_data/spike_deeptector.txt";
-  string src_pre_file = "tb_data/spike_deeptector_pre.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/spike_deeptector.txt";
+  string src_pre_file = CPP_ROOT_PATH "tb_data/spike_deeptector_pre.txt";
 
   int mem_len = 477587;
   int num_params = 449587;

@@ -1,4 +1,5 @@
 #include "../../src/layers/max_pool_2d.h"
+#include "../tb_config.h"
 #include "../utils.h"
 #include <cmath>
 #include <iostream>
@@ -10,8 +11,8 @@ using namespace std;
 int main() {
   bool passed = true;
 
-  string src_file = "tb_data/max_pool_2d.txt";
-  string src_params = "tb_data/max_pool_2d_params.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/max_pool_2d.txt";
+  string src_params = CPP_ROOT_PATH "tb_data/max_pool_2d_params.txt";
 
   MAX_POOL_2D_PARAMS params;
   map<string, int> f_params = read_params(src_params);

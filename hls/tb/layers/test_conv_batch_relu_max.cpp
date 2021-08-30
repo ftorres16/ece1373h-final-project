@@ -1,5 +1,6 @@
 #include "../../src/layers/conv_batch_relu_max.h"
 #include "../../src/layers/max_pool_2d.h"
+#include "../tb_config.h"
 #include "../utils.h"
 #include <cmath>
 #include <iostream>
@@ -10,9 +11,9 @@ using namespace std;
 int main() {
   bool passed = true;
 
-  string src_file = "tb_data/conv_batch_relu_max.txt";
-  string src_pre_file = "tb_data/conv_batch_relu_max_pre.txt";
-  string src_params = "tb_data/conv_batch_relu_max_params.txt";
+  string src_file = CPP_ROOT_PATH "tb_data/conv_batch_relu_max.txt";
+  string src_pre_file = CPP_ROOT_PATH "tb_data/conv_batch_relu_max_pre.txt";
+  string src_params = CPP_ROOT_PATH "tb_data/conv_batch_relu_max_params.txt";
 
   CONV_LAYER_PARAMS conv_params;
   MAX_POOL_2D_PARAMS max_pool_params;

@@ -5,6 +5,8 @@
 void conv_relu_layer(float *mem, const int params_offset,
                      const int input_offset, const int output_offset,
                      CONV_LAYER_PARAMS params) {
+  // `pragmas` specified in directives.tcl so this layer can be used in
+  // different projects
 
   int num_conv_weights = get_conv_num_weights(params);
 
