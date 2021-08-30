@@ -10,7 +10,6 @@ void spike_deeptector_main(float *mem,
                            int *n_neural_channels, int *neural_channels) {
   // `pragmas` specified in directives.tcl so this layer can be used in
   // different projects
-  // #pragma HLS INTERFACE s_axilite port = return bundle = CTRL_BUS
 
   /*
    * `electrodes_offset` is an array of length `n_electrodes + 1` with where the

@@ -1,8 +1,8 @@
 #ifndef SPIKE_DEEPCLASSIFIER_H
 #define SPIKE_DEEPCLASSIFIER_H
 
-#include "bar/bar_main.h"
-#include "spike_deeptector/spike_deeptector_main.h"
+#include "bar/bar.h"
+#include "spike_deeptector/spike_deeptector.h"
 
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
