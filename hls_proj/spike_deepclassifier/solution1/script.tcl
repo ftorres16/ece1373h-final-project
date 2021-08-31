@@ -7,6 +7,8 @@ open_project spike_deepclassifier
 set_top spike_deepclassifier
 add_files ../hls/src/spike_deepclassifier.cpp
 add_files ../hls/src/spike_deepclassifier.h
+add_files ../hls/src/pca.cpp
+add_files ../hls/src/pca.h
 add_files ../hls/src/spike_deeptector/spike_deeptector.cpp
 add_files ../hls/src/spike_deeptector/spike_deeptector.h
 add_files ../hls/src/spike_deeptector/spike_deeptector_cumulative.cpp
