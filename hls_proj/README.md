@@ -10,4 +10,4 @@ To create a Vivado HLS project for any block run the following:
 
 After successful creation you can open the projects with a GUI and Vivado_HLS if you so prefer.
 
-**⚠️ Disclaimer: Scripts are mean to be run with Vivado Suite version 2019.1, use other versions at your own risk. ⚠️**
+> :warning: Disclaimer: Scripts are mean to be run with Vivado Suite version 2019.1, use other versions at your own risk.

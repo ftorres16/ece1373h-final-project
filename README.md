@@ -2,7 +2,7 @@
 
 ## Setup
 
-**⚠️ Disclaimer: Scripts are mean to be run with Vivado Suite version 2019.1, use other versions at your own risk. ⚠️**
+> :warning: Disclaimer: Scripts are mean to be run with Vivado Suite version 2019.1, use other versions at your own risk.
 
 In order to access PicoZed FMC Carrier Card 2 as a device / board from Vivado and Vivado HLS, 
 copy the 'picozed_7030_fmc2' directory to the following path:
