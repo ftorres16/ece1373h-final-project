@@ -2,6 +2,7 @@
 #include "bar/bar.h"
 #include "bar/bar_main.h"
 #include "config.h"
+#include "pca.h"
 #include "spike_deeptector/spike_deeptector.h"
 #include "spike_deeptector/spike_deeptector_main.h"
 
@@ -70,7 +71,8 @@ void spike_deepclassifier(
     }
 #endif
 
-    // pca and other code will come
+    // PCA decomposition, to be used by kNN for finishign the classifier
+    pca(mem, samples_offset[0], bar_mem_params.mem_0_offset, n_samples);
   }
 }
 
