@@ -6,6 +6,7 @@
 
 # and not gitignore
 !.gitignore
+!README.md
 
 # only version files needed to recreate the project
 !**/script.tcl
