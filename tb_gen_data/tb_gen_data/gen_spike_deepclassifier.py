@@ -6,8 +6,7 @@ import numpy as np
 
 from tb_gen_data.config import OUTPUT_FOLDER
 from tb_gen_data.gen_load_weights_base import GenLoadWeightsBase
-from tb_gen_data.models.bar import BAR
-from tb_gen_data.models.spike_deeptector import SpikeDeeptector
+from tb_gen_data.models.spike_deepclassifier import SpikeDeepClassifier
 from tb_gen_data.utils import gen_mem_overwrite
 
 
@@ -18,8 +17,7 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         self.in_y = 20
         self.in_x = 48
 
-        self.spike_deeptector = SpikeDeeptector()
-        self.bar = BAR()
+        self.model = SpikeDeepClassifier()
 
     def gen_input(
         self,
@@ -48,28 +46,46 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         self.input_.append(real_data)
 
     def gen_output(self):
-        self.spike_deeptector.eval()
-        self.bar.eval()
+        self.model.eval()
+        self.output = self.model(self.input_)
 
-        self.spike_deeptector_outputs = [
-            self.spike_deeptector(input_) for input_ in self.input_
-        ]
-        self.bar_outputs = [
-            self.bar(sample)
-            for electrode in self.input_
-            for chunk in torch.split(electrode, 1)
-            for sample in torch.split(chunk, 1, dim=2)
-        ]
-
-    def _gen_mem(self):
-        spike_deeptector_params = self._get_model_params(self.spike_deeptector)
-        bar_params = self._get_model_params(self.bar)
+    def _gen_mem_pre(self):
+        """
+        Get the memory before doing any computations.
+        """
+        spike_deeptector_params = self._get_model_params(self.model.spike_deeptector)
+        bar_params = self._get_model_params(self.model.bar)
 
         mem_0, mem_1 = gen_mem_overwrite(
-            self.input_ + self.spike_deeptector.outputs + self.bar.outputs
+            self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
         )
 
-        tensors = spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1]
+        mem_0 = torch.zeros_like(mem_0)
+        mem_1 = torch.zeros_like(mem_1)
+        output = [torch.zeros_like(sample) for sample in self.output]
+
+        tensors = (
+            spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1] + output
+        )
+        flat_tensors = [torch.flatten(tensor) for tensor in tensors]
+
+        self.mem_pre = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
+
+    def _gen_mem(self):
+        spike_deeptector_params = self._get_model_params(self.model.spike_deeptector)
+        bar_params = self._get_model_params(self.model.bar)
+
+        mem_0, mem_1 = gen_mem_overwrite(
+            self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
+        )
+
+        tensors = (
+            spike_deeptector_params
+            + bar_params
+            + self.input_
+            + [mem_0, mem_1]
+            + self.output
+        )
         flat_tensors = [torch.flatten(tensor) for tensor in tensors]
 
         self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
@@ -87,6 +103,7 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             f"int input_len = {sum(len(torch.flatten(input_)) for input_ in self.input_)};"
         )
         print(f"int mem_0_len = {len(torch.flatten(mem_0))};")
+        print(f"int mem_1_len = {len(torch.flatten(mem_1))};")
 
     def _gen_mem_bin(self):
         FLOAT_SIZE_BYTES = 4
@@ -124,8 +141,9 @@ if __name__ == "__main__":
 
     gen = GenSpikeDeepClassifier("spike_deepclassifier")
     gen.gen_input()
-    gen._load_mem_file("matlab_spike_deeptector.txt", gen.spike_deeptector)
-    gen._load_mem_file("matlab_bar.txt", gen.bar)
+    gen._load_mem_file("matlab_spike_deeptector.txt", gen.model.spike_deeptector)
+    gen._load_mem_file("matlab_bar.txt", gen.model.bar)
     gen.gen_output()
+    gen.write_mem_pre()
     gen.write_mem()
     gen.write_mem_bin()

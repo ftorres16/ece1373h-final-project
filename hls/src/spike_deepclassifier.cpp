@@ -14,12 +14,13 @@ using namespace std;
 
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
-    const BAR_MEM_PARAMS bar_mem_params, const int *electrodes_offset,
-    const int n_electrodes) {
+    const BAR_MEM_PARAMS bar_mem_params, const int outputs_offset,
+    const int *electrodes_offset, const int n_electrodes) {
   // `pragmas` specified in directives.tcl so this layer can be used in
   // different projects
 
   int n_neural_channels = 0;
+  int n_prev_samples = 0;
   int neural_channels[MAX_DEEPTECTOR_ELECTRODES];
   int samples_offset[MAX_DEEPTECTOR_SAMPLES];
   int spikes_offset[MAX_DEEPTECTOR_SAMPLES];
@@ -42,7 +43,7 @@ void spike_deepclassifier(
     n_samples = get_n_samples(electrodes_offset, neural_channels[i]);
 
 #ifndef __SYNTHESIS__
-    cout << "Found " << n_samples << " samples for channel " << i << "."
+    cout << "Found " << n_samples << " samples for neural channel " << i << "."
          << endl;
 #endif
 
@@ -72,7 +73,11 @@ void spike_deepclassifier(
 #endif
 
     // PCA decomposition, to be used by kNN for finishign the classifier
-    pca(mem, samples_offset[0], bar_mem_params.mem_0_offset, n_samples);
+    pca(mem, samples_offset[0],
+        outputs_offset + n_prev_samples * SAMPLE_LEN * sizeof(float),
+        n_samples);
+
+    n_prev_samples += n_samples;
   }
 }
 
