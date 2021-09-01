@@ -62,7 +62,12 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
 
         mem_0 = torch.zeros_like(mem_0)
         mem_1 = torch.zeros_like(mem_1)
-        output = [torch.zeros_like(sample) for sample in self.output]
+
+        # get empty outputs in the same size as the input
+        output = []
+        for channel in self.input_:
+            output += torch.split(channel, 1)
+        output = [torch.zeros_like(sample) for sample in output]
 
         tensors = (
             spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1] + output
@@ -79,12 +84,21 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
         )
 
+        # output is padded because potentially all inputs could be neural
+        # get empty outputs in the same size as the input
+        output = []
+        for channel in self.input_:
+            output += torch.split(channel, 1)
+        output = [torch.zeros_like(sample) for sample in output]
+
+        split_pca_output = []
+        for channel in self.output:
+            split_pca_output += torch.split(channel, 1)
+
+        output[: len(split_pca_output)] = split_pca_output
+
         tensors = (
-            spike_deeptector_params
-            + bar_params
-            + self.input_
-            + [mem_0, mem_1]
-            + self.output
+            spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1] + output
         )
         flat_tensors = [torch.flatten(tensor) for tensor in tensors]
 
