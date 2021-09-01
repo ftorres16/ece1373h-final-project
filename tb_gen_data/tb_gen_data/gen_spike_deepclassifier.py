@@ -8,6 +8,7 @@ from tb_gen_data.config import OUTPUT_FOLDER
 from tb_gen_data.gen_load_weights_base import GenLoadWeightsBase
 from tb_gen_data.models.spike_deepclassifier import SpikeDeepClassifier
 from tb_gen_data.utils import gen_mem_overwrite
+from tb_gen_data.mem.mem import Mem
 
 
 class GenSpikeDeepClassifier(GenLoadWeightsBase):
@@ -18,6 +19,7 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         self.in_x = 48
 
         self.model = SpikeDeepClassifier()
+        self.mem_obj = None
 
     def gen_input(
         self,
@@ -53,30 +55,17 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         """
         Get the memory before doing any computations.
         """
-        spike_deeptector_params = self._get_model_params(self.model.spike_deeptector)
-        bar_params = self._get_model_params(self.model.bar)
-
-        mem_0, mem_1 = gen_mem_overwrite(
-            self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
-        )
-
-        mem_0 = torch.zeros_like(mem_0)
-        mem_1 = torch.zeros_like(mem_1)
-
-        # get empty outputs in the same size as the input
-        output = []
-        for channel in self.input_:
-            output += torch.split(channel, 1)
-        output = [torch.zeros_like(sample) for sample in output]
-
-        tensors = (
-            spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1] + output
-        )
-        flat_tensors = [torch.flatten(tensor) for tensor in tensors]
-
-        self.mem_pre = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
+        self._gen_mem()
+        self.mem_pre = self.mem_obj.to_text(pre=True)
 
     def _gen_mem(self):
+        if getattr(self, "mem_obj") is not None:
+            print(
+                "Warning: Memory has already been generated, you should probably be OK."
+                " Skipping this call."
+            )
+            return
+
         spike_deeptector_params = self._get_model_params(self.model.spike_deeptector)
         bar_params = self._get_model_params(self.model.bar)
 
@@ -84,70 +73,35 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
         )
 
-        # output is padded because potentially all inputs could be neural
-        # get empty outputs in the same size as the input
-        output = []
-        for channel in self.input_:
-            output += torch.split(channel, 1)
-        output = [torch.zeros_like(sample) for sample in output]
+        input_len = sum(torch.numel(t) for t in self.input_)
+        output_len = sum(torch.numel(t) for t in self.output)
+        output_pad_zeros = input_len - output_len
 
-        split_pca_output = []
-        for channel in self.output:
-            split_pca_output += torch.split(channel, 1)
-
-        output[: len(split_pca_output)] = split_pca_output
-
-        tensors = (
-            spike_deeptector_params + bar_params + self.input_ + [mem_0, mem_1] + output
+        mem = Mem()
+        _ = mem.add_tensor_list_chunk(
+            spike_deeptector_params, "spike_deeptector_params"
         )
-        flat_tensors = [torch.flatten(tensor) for tensor in tensors]
+        _ = mem.add_tensor_list_chunk(bar_params, "bar_params")
+        _ = mem.add_tensor_list_chunk(self.input_, "input")
+        _ = mem.add_tensor_list_chunk(mem_0, "mem_0", masked=True)
+        _ = mem.add_tensor_list_chunk(mem_1, "mem_1", masked=True)
+        _ = mem.add_tensor_list_chunk(
+            self.output, "output", pad_zeros=output_pad_zeros, masked=False
+        )
 
-        self.mem = [f"{x}\n" for tensor in flat_tensors for x in tensor.tolist()]
+        self.mem_obj = mem
+        self.mem = mem.to_text()
 
-        print(f"int mem_len = {len(self.mem)};")
-        print(
-            "int num_spike_deeptector_params"
-            f" = {sum(len(torch.flatten(param)) for param in spike_deeptector_params)};"
-        )
-        print(
-            "int num_bar_params"
-            f" = {sum(len(torch.flatten(param)) for param in bar_params)};"
-        )
-        print(
-            f"int input_len = {sum(len(torch.flatten(input_)) for input_ in self.input_)};"
-        )
-        print(f"int mem_0_len = {len(torch.flatten(mem_0))};")
-        print(f"int mem_1_len = {len(torch.flatten(mem_1))};")
+        print(f"int mem_len = {mem.len};")
+        print("int num_spike_deeptector_params" f" = {mem.chunks[0].len};")
+        print("int num_bar_params" f" = {mem.chunks[1].len};")
+        print(f"int input_len = {mem.chunks[2].len};")
+        print(f"int mem_0_len = {mem.chunks[3].len};")
+        print(f"int mem_1_len = {mem.chunks[4].len};")
 
     def _gen_mem_bin(self):
-        FLOAT_SIZE_BYTES = 4
-        BYTE_SIZE_BITS = 8
-        BIT_ALIGNMENT = 512
-
-        self.mem_bin = array("f")
-
-        # this is notn very efficient, in production you probably would want
-        # to get `self._mem_bin` first and then construct `self.mem` from it
-        mem_list = [float(entry) for entry in self.mem]
-
-        self.mem_bin.fromlist(mem_list)
-
-        # memory needs alignment to BIT_ALIGNMENT bits
-        mem_bin_size = len(self.mem_bin) * FLOAT_SIZE_BYTES * BYTE_SIZE_BITS
-        pad_bits = (
-            BIT_ALIGNMENT - mem_bin_size % BIT_ALIGNMENT
-            if mem_bin_size % BIT_ALIGNMENT != 0
-            else 0
-        )
-
-        if pad_bits % FLOAT_SIZE_BYTES * BYTE_SIZE_BITS != 0:
-            print(
-                f"Warning! Padding bits {pad_bits} can't be realized with 4 byte floats"
-            )
-
-        pad_floats = pad_bits // (FLOAT_SIZE_BYTES * BYTE_SIZE_BITS)
-
-        self.mem_bin.fromlist([0.0 for _ in range(pad_floats)])
+        self._gen_mem()
+        self.mem_bin = self.mem_obj.to_bin()
 
 
 if __name__ == "__main__":
