@@ -49,7 +49,11 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
 
     def gen_output(self):
         self.model.eval()
-        self.output = self.model(self.input_)
+        _ = self.model(self.input_)
+
+        self.pca_outputs = self.model.pca_outputs
+        self.channel_labels = self.model.channel_labels
+        self.bar_labels = self.model.bar_labels
 
     def _gen_mem_pre(self):
         """
@@ -73,9 +77,20 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             self.input_ + self.model.spike_deeptector.outputs + self.model.bar.outputs
         )
 
+        # channel labels
+        channel_labels = [
+            torch.tensor([float(label.value) for label in self.channel_labels])
+        ]
+
+        # bar labels
+        bar_labels = [torch.tensor([float(label.value) for label in self.bar_labels])]
+        n_total_samples = sum(t.shape[0] * t.shape[2] for t in self.input_)
+        bar_pad_zeros = n_total_samples - torch.numel(bar_labels[0])
+
+        # pca outputs
         input_len = sum(torch.numel(t) for t in self.input_)
-        output_len = sum(torch.numel(t) for t in self.output)
-        output_pad_zeros = input_len - output_len
+        pca_outputs_len = sum(torch.numel(t) for t in self.pca_outputs)
+        pca_outputs_pad_zeros = input_len - pca_outputs_len
 
         mem = Mem()
         _ = mem.add_tensor_list_chunk(
@@ -85,19 +100,26 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         _ = mem.add_tensor_list_chunk(self.input_, "input")
         _ = mem.add_tensor_list_chunk(mem_0, "mem_0", masked=True)
         _ = mem.add_tensor_list_chunk(mem_1, "mem_1", masked=True)
+        # _ = mem.add_tensor_list_chunk(channel_labels, "channel_labels", masked=True)
+        # _ = mem.add_tensor_list_chunk(
+        #     bar_labels, "bar_labels", pad_zeros=bar_pad_zeros, masked=True
+        # )
         _ = mem.add_tensor_list_chunk(
-            self.output, "output", pad_zeros=output_pad_zeros, masked=False
+            self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
         )
+
+        import ipdb
+
+        ipdb.set_trace()
 
         self.mem_obj = mem
         self.mem = mem.to_text()
 
         print(f"int mem_len = {mem.len};")
-        print("int num_spike_deeptector_params" f" = {mem.chunks[0].len};")
-        print("int num_bar_params" f" = {mem.chunks[1].len};")
-        print(f"int input_len = {mem.chunks[2].len};")
-        print(f"int mem_0_len = {mem.chunks[3].len};")
-        print(f"int mem_1_len = {mem.chunks[4].len};")
+
+        for chunk in mem.chunks:
+            if getattr(chunk, "name") is not None:
+                print(f"int {chunk.name}_len = {chunk.len};")
 
     def _gen_mem_bin(self):
         self._gen_mem()

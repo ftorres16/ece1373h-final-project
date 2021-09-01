@@ -24,6 +24,9 @@ class Mem:
     ) -> int:
         """
         Only works correctly if all chunks are the same data type. Returns chunk index.
+
+        - pad_zeros: number of zeros to append at the end.
+        - masked: when creating an output with `pre == True`, this chunk should be all zeros.
         """
         chunk = MemChunk(
             data, offset=self.len, name=name, pad_zeros=pad_zeros, masked=masked
