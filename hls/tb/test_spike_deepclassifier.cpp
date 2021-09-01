@@ -11,14 +11,14 @@ int main() {
   string src_file = CPP_ROOT_PATH "tb_data/spike_deepclassifier.txt";
 
   int mem_len = 2427172;
-  int num_spike_deeptector_params = 449587;
-  int num_bar_params = 1923825;
+  int spike_deeptector_params_len = 449587;
+  int bar_params_len = 1923825;
   int input_len = 2880;
   int mem_0_len = 24000;
   int mem_1_len = 24000;
 
-  int output_len = mem_len - mem_0_len - mem_1_len - num_bar_params -
-                   num_spike_deeptector_params;
+  int output_len = mem_len - mem_0_len - mem_1_len - bar_params_len -
+                   spike_deeptector_params_len;
 
   float *mem, *mem_gold;
 
@@ -41,8 +41,8 @@ int main() {
 
   sd_mem_params.params_offset = 0;
   bar_mem_params.params_offset =
-      sd_mem_params.params_offset + num_spike_deeptector_params * sizeof(float);
-  inputs_offset = bar_mem_params.params_offset + num_bar_params * sizeof(float);
+      sd_mem_params.params_offset + spike_deeptector_params_len * sizeof(float);
+  inputs_offset = bar_mem_params.params_offset + bar_params_len * sizeof(float);
 
   sd_mem_params.mem_0_offset = inputs_offset + input_len * sizeof(float);
   sd_mem_params.mem_1_offset =
