@@ -30,8 +30,8 @@ int main() {
     return -1;
   }
 
-  for (int i = 0; i < mem_len - output_len; i++) {
-    mem[i] = mem_gold[i];
+  for (int i = 0; i < mem_len; i++) {
+    mem[i] = i < mem_len - output_len ? mem_gold[i] : 0.0;
   }
 
   SPIKE_DEEPTECTOR_MEM_PARAMS sd_mem_params;
@@ -50,7 +50,7 @@ int main() {
   bar_mem_params.mem_0_offset = sd_mem_params.mem_0_offset;
   bar_mem_params.mem_1_offset = sd_mem_params.mem_1_offset;
 
-  outputs_offset = bar_mem_params.mem_0_offset + mem_1_len * sizeof(float);
+  outputs_offset = bar_mem_params.mem_1_offset + mem_1_len * sizeof(float);
 
   int n_electrodes = 2;
   int electrodes_offset[n_electrodes];
@@ -70,7 +70,7 @@ int main() {
     // skip the check for mem buffers, because blocks are called in a different
     // order than the python tb_gen, only verify the output
     if (bar_mem_params.mem_0_offset <= i * sizeof(float) &&
-        i < outputs_offset) {
+        i * sizeof(float) < outputs_offset) {
       continue;
     }
     float diff = mem[i] - mem_gold[i];
