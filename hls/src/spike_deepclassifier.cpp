@@ -14,18 +14,49 @@ using namespace std;
 
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
-    const BAR_MEM_PARAMS bar_mem_params, const int *electrodes_offset,
-    const int n_electrodes) {
+    const BAR_MEM_PARAMS bar_mem_params, const int outputs_offset,
+    const int *electrodes_offset, const int n_electrodes) {
   // `pragmas` specified in directives.tcl so this layer can be used in
   // different projects
 
   int n_neural_channels = 0;
+
+  int n_samples;
+  int n_prev_samples = 0;
   int neural_channels[MAX_DEEPTECTOR_ELECTRODES];
   int samples_offset[MAX_DEEPTECTOR_SAMPLES];
-  int spikes_offset[MAX_DEEPTECTOR_SAMPLES];
+  int spike_samples[MAX_DEEPTECTOR_SAMPLES];
 
+  int channel_labels_offset;
+  int bar_labels_offset, bar_labels_len;
+  int pca_offset;
+
+  // Memory addresses
+  channel_labels_offset = outputs_offset;
+  bar_labels_offset = channel_labels_offset + n_electrodes * sizeof(float);
+
+  bar_labels_len = 0;
+  for (int i = 0; i < n_electrodes; i++) {
+    bar_labels_len += get_n_samples(electrodes_offset, i);
+  }
+  pca_offset = bar_labels_offset + bar_labels_len * sizeof(float);
+
+  // Begin processing
   spike_deeptector_main(mem, deeptector_mem_params, n_electrodes,
                         electrodes_offset, &n_neural_channels, neural_channels);
+
+  // Store deeptector outputs
+  for (int i = 0; i < n_electrodes; i++) {
+    float label = 1.0;
+
+    for (int j = 0; j < n_neural_channels; j++) {
+      if (neural_channels[j] == i) {
+        label = 0.0;
+      }
+    }
+
+    mem[channel_labels_offset / sizeof(float) + i] = label;
+  }
 
 #ifndef __SYNTHESIS__
   // for testing purposes only
@@ -37,42 +68,49 @@ void spike_deepclassifier(
 #endif
 
   for (int i = 0; i < n_neural_channels; i++) {
-    int n_samples;
-
     n_samples = get_n_samples(electrodes_offset, neural_channels[i]);
 
 #ifndef __SYNTHESIS__
-    cout << "Found " << n_samples << " samples for channel " << i << "."
+    cout << "Found " << n_samples << " samples for neural channel " << i << "."
          << endl;
 #endif
 
     get_samples_offset(samples_offset, electrodes_offset, n_samples,
                        neural_channels[i]);
 
-#ifndef __SYNTHESIS__
-    // for debug purposes only
-    for (int j = 0; j < n_samples; j++) {
-      cout << "Sample " << j << " has offset " << samples_offset[j] << endl;
-    }
-#endif
-
     int n_spikes;
 
     // Processing for every neural channel.
     bar_main(mem, bar_mem_params, n_samples, samples_offset, &n_spikes,
-             spikes_offset);
+             spike_samples);
+
+    // Store BAR results
+    for (int i_sample = 0; i_sample < n_samples; i_sample++) {
+      float label = 1.0;
+
+      for (int i_spike = 0; i_spike < n_spikes; i_spike++) {
+        if (spike_samples[i_spike] == i_sample) {
+          label = 0.0;
+        }
+      }
+      mem[bar_labels_offset / sizeof(float) + n_prev_samples + i_sample] =
+          label;
+    }
 
 #ifndef __SYNTHESIS__
     // for testing purposes only
     cout << "Found " << n_spikes << " spikes." << endl;
     for (int j = 0; j < n_spikes; j++) {
-      cout << "Spike number " << j << " at memory offset " << spikes_offset[j]
+      cout << "Spike number " << j << " at memory offset " << spike_samples[j]
            << endl;
     }
 #endif
 
     // PCA decomposition, to be used by kNN for finishign the classifier
-    pca(mem, samples_offset[0], bar_mem_params.mem_0_offset, n_samples);
+    pca(mem, samples_offset[0],
+        pca_offset + n_prev_samples * SAMPLE_LEN * sizeof(float), n_samples);
+
+    n_prev_samples += n_samples;
   }
 }
 

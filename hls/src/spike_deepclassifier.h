@@ -6,8 +6,8 @@
 
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
-    const BAR_MEM_PARAMS bar_mem_params, const int *electrodes_offset,
-    const int n_electrodes);
+    const BAR_MEM_PARAMS bar_mem_params, const int outputs_offset,
+    const int *electrodes_offset, const int n_electrodes);
 
 int get_n_samples(const int *electrodes_offset, const int idx);
 

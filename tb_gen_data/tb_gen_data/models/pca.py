@@ -9,13 +9,9 @@ class PCAModel(nn.Module):
     def forward(self, input):
         demeaned_input = input - torch.mean(input, dim=0, keepdim=True)
 
-        cov = torch.matmul(demeaned_input, demeaned_input.T)
+        cov = torch.matmul(demeaned_input.T, demeaned_input)
         cov /= input.shape[0] - 1
 
         U, S, V = torch.svd(cov, some=False)
 
-        import ipdb
-
-        ipdb.set_trace()
-
-        return torch.matmul(input, U)
+        return torch.matmul(input, V)

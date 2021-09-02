@@ -68,7 +68,7 @@ x_cov_row_loop:
                                                                      pc_i);
 // Copy output data to memory
 pc_row_loop:
-  for (int r = 0; r < X_ROWS; r++) {
+  for (int r = 0; r < in_rows; r++) {
   pc_col_loop:
     for (int c = 0; c < X_COLS; c++) {
       mem[out_addr + r * X_COLS + c] = pc_i[r][c];
