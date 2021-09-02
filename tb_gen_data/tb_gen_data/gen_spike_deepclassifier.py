@@ -108,10 +108,6 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
         )
 
-        import ipdb
-
-        ipdb.set_trace()
-
         self.mem_obj = mem
         self.mem = mem.to_text()
 
