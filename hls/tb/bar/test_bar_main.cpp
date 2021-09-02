@@ -40,13 +40,13 @@ int main() {
   int samples_offset[] = {mem_params.mem_0_offset};
 
   int n_spikes;
-  int spikes_offset[n_samples];
+  int spike_samples[n_samples];
 
   int n_spikes_gold = 1;
-  int spikes_offset_gold[] = {mem_params.mem_0_offset};
+  int spike_samples_gold[] = {0};
 
   bar_main(mem, mem_params, n_samples, samples_offset, &n_spikes,
-           spikes_offset);
+           spike_samples);
 
   if (n_spikes != n_spikes_gold) {
     cout << "ERROR when comoparing n_spikes. Expected: " << n_spikes_gold
@@ -54,10 +54,10 @@ int main() {
   }
 
   for (int i = 0; i < n_spikes; i++) {
-    if (spikes_offset[i] != spikes_offset_gold[i]) {
-      cout << "ERROR when comoparing spikes_offset[" << i
-           << "]. Expected: " << spikes_offset_gold[i]
-           << " Got: " << spikes_offset[i] << endl;
+    if (spike_samples[i] != spike_samples_gold[i]) {
+      cout << "ERROR when comoparing spike_samples[" << i
+           << "]. Expected: " << spike_samples_gold[i]
+           << " Got: " << spike_samples[i] << endl;
     }
   }
 

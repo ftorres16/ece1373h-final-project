@@ -100,10 +100,10 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         _ = mem.add_tensor_list_chunk(self.input_, "input")
         _ = mem.add_tensor_list_chunk(mem_0, "mem_0", masked=True)
         _ = mem.add_tensor_list_chunk(mem_1, "mem_1", masked=True)
-        # _ = mem.add_tensor_list_chunk(channel_labels, "channel_labels", masked=True)
-        # _ = mem.add_tensor_list_chunk(
-        #     bar_labels, "bar_labels", pad_zeros=bar_pad_zeros, masked=True
-        # )
+        _ = mem.add_tensor_list_chunk(channel_labels, "channel_labels", masked=True)
+        _ = mem.add_tensor_list_chunk(
+            bar_labels, "bar_labels", pad_zeros=bar_pad_zeros, masked=True
+        )
         _ = mem.add_tensor_list_chunk(
             self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
         )

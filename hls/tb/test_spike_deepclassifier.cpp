@@ -10,7 +10,7 @@ int main() {
   bool passed = true;
   string src_file = CPP_ROOT_PATH "tb_data/spike_deepclassifier.txt";
 
-  int mem_len = 2427172;
+  int mem_len = 2427234;
   int spike_deeptector_params_len = 449587;
   int bar_params_len = 1923825;
   int input_len = 2880;
