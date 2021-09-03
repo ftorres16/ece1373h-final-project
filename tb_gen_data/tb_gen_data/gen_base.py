@@ -21,6 +21,7 @@ class GenBase:
         # memory before any computations take place
         self.mem_pre: T.List[str] = []
         self.out_pre_file = f"{out_folder}/{name}_pre.txt"
+        self.out_bin_file_pre = f"{out_folder}/{name}_pre.bin"
 
     def gen_input(self):
         """
@@ -63,6 +64,22 @@ class GenBase:
 
         with open(self.out_bin_file, "wb") as f:
             f.write(self.mem_bin)
+
+    def _gen_mem_bin_pre(self):
+        """
+        Load the memory layout before any computation takes place in `self.mem_bin_pre`.
+        """
+        raise NotImplementedError("This is an abstract class.")
+
+    def write_mem_bin_pre(self):
+        """
+        Write the memory layout before any computation takes place to a binary file
+        in path `self.out_bin_file_pre`.
+        """
+        self._gen_mem_bin_pre()
+
+        with open(self.out_bin_file_pre, "wb") as f:
+            f.write(self.mem_bin_pre)
 
     def _gen_mem_pre(self):
         """

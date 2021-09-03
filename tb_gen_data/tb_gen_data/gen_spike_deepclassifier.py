@@ -136,6 +136,10 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         self._gen_mem()
         self.mem_bin = self.mem_obj.to_bin()
 
+    def _gen_mem_bin_pre(self):
+        self._gen_mem()
+        self.mem_bin_pre = self.mem_obj.to_bin(pre=True)
+
 
 if __name__ == "__main__":
     torch.manual_seed(0)
@@ -148,3 +152,4 @@ if __name__ == "__main__":
     gen.write_mem_pre()
     gen.write_mem()
     gen.write_mem_bin()
+    gen.write_mem_bin_pre()
