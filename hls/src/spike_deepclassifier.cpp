@@ -15,7 +15,7 @@ using namespace std;
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
     const BAR_MEM_PARAMS bar_mem_params, const int outputs_offset,
-    const int *electrodes_offset, const int n_electrodes) {
+    const int electrodes_addr_offset, const int n_electrodes) {
   // `pragmas` specified in directives.tcl so this layer can be used in
   // different projects
 
@@ -37,13 +37,14 @@ void spike_deepclassifier(
 
   bar_labels_len = 0;
   for (int i = 0; i < n_electrodes; i++) {
-    bar_labels_len += get_n_samples(electrodes_offset, i);
+    bar_labels_len += get_n_samples(mem, electrodes_addr_offset, i);
   }
   pca_offset = bar_labels_offset + bar_labels_len * sizeof(float);
 
   // Begin processing
   spike_deeptector_main(mem, deeptector_mem_params, n_electrodes,
-                        electrodes_offset, &n_neural_channels, neural_channels);
+                        electrodes_addr_offset, &n_neural_channels,
+                        neural_channels);
 
   // Store deeptector outputs
   for (int i = 0; i < n_electrodes; i++) {
@@ -68,14 +69,14 @@ void spike_deepclassifier(
 #endif
 
   for (int i = 0; i < n_neural_channels; i++) {
-    n_samples = get_n_samples(electrodes_offset, neural_channels[i]);
+    n_samples = get_n_samples(mem, electrodes_addr_offset, neural_channels[i]);
 
 #ifndef __SYNTHESIS__
     cout << "Found " << n_samples << " samples for neural channel " << i << "."
          << endl;
 #endif
 
-    get_samples_offset(samples_offset, electrodes_offset, n_samples,
+    get_samples_offset(mem, samples_offset, electrodes_addr_offset, n_samples,
                        neural_channels[i]);
 
     int n_spikes;
@@ -114,15 +115,18 @@ void spike_deepclassifier(
   }
 }
 
-int get_n_samples(const int *electrodes_offset, const int idx) {
-  return (electrodes_offset[idx + 1] - electrodes_offset[idx]) /
+int get_n_samples(float *mem, const int electrodes_addr_offset, const int idx) {
+  return (mem[electrodes_addr_offset / sizeof(float) + idx + 1] -
+          mem[electrodes_addr_offset / sizeof(float) + idx]) /
          (sizeof(float) * SAMPLE_LEN);
 }
 
-void get_samples_offset(int *samples_offset, const int *electrodes_offset,
-                        const int n_samples, const int start_idx) {
+void get_samples_offset(float *mem, int *samples_offset,
+                        const int electrodes_addr_offset, const int n_samples,
+                        const int start_idx) {
   for (int i = 0; i < n_samples; i++) {
     samples_offset[i] =
-        electrodes_offset[start_idx] + SAMPLE_LEN * i * sizeof(float);
+        mem[electrodes_addr_offset / sizeof(float) + start_idx] +
+        SAMPLE_LEN * i * sizeof(float);
   }
 }

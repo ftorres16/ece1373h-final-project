@@ -46,5 +46,5 @@ config_export -format ip_catalog
 source "./spike_deepclassifier/solution1/directives.tcl"
 csim_design
 csynth_design
-cosim_design -setup -reduce_diskspace -trace_level port
+cosim_design -setup -trace_level port
 export_design -format ip_catalog

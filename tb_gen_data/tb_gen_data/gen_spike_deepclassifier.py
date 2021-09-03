@@ -1,5 +1,4 @@
 import typing as T
-from array import array
 
 import torch
 import numpy as np
@@ -9,6 +8,9 @@ from tb_gen_data.gen_load_weights_base import GenLoadWeightsBase
 from tb_gen_data.models.spike_deepclassifier import SpikeDeepClassifier
 from tb_gen_data.utils import gen_mem_overwrite
 from tb_gen_data.mem.mem import Mem
+
+NUM_ELECTRODES = 96
+FLOAT_SIZE_BYTES = 4
 
 
 class GenSpikeDeepClassifier(GenLoadWeightsBase):
@@ -92,20 +94,33 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         pca_outputs_len = sum(torch.numel(t) for t in self.pca_outputs)
         pca_outputs_pad_zeros = input_len - pca_outputs_len
 
+        electrodes_offset = torch.zeros(NUM_ELECTRODES)
+        n_inputs = len(self.input_)
+        for idx, input_ in enumerate(self.input_):
+            electrodes_offset[idx + 1 : n_inputs + 1] += (
+                torch.numel(input_) * FLOAT_SIZE_BYTES
+            )
+
         mem = Mem()
+        _ = mem.add_tensor_list_chunk([electrodes_offset], "electrodes_offset")
         _ = mem.add_tensor_list_chunk(
             spike_deeptector_params, "spike_deeptector_params"
         )
         _ = mem.add_tensor_list_chunk(bar_params, "bar_params")
-        _ = mem.add_tensor_list_chunk(self.input_, "input")
-        _ = mem.add_tensor_list_chunk(mem_0, "mem_0", masked=True)
-        _ = mem.add_tensor_list_chunk(mem_1, "mem_1", masked=True)
+        input_idx = mem.add_tensor_list_chunk(self.input_, "input")
+        _ = mem.add_tensor_list_chunk([mem_0], "mem_0", masked=True)
+        _ = mem.add_tensor_list_chunk([mem_1], "mem_1", masked=True)
         _ = mem.add_tensor_list_chunk(channel_labels, "channel_labels", masked=True)
         _ = mem.add_tensor_list_chunk(
             bar_labels, "bar_labels", pad_zeros=bar_pad_zeros, masked=True
         )
         _ = mem.add_tensor_list_chunk(
             self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
+        )
+
+        # update electrodes offset with actual memory addresses
+        electrodes_offset[: n_inputs + 1] += (
+            mem.chunks[input_idx].offset * FLOAT_SIZE_BYTES
         )
 
         self.mem_obj = mem
