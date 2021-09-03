@@ -5,7 +5,7 @@
 ############################################################
 set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier"
 set_directive_interface -mode m_axi -depth 2427330 "spike_deepclassifier" mem
-set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier" depetector_mem_params
+set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier" deeptector_mem_params
 set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier" bar_mem_params
 set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier" outputs_offset
 set_directive_interface -mode s_axilite -bundle CTRL_BUS "spike_deepclassifier" n_electrodes
