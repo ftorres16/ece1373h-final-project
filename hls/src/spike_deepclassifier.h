@@ -7,11 +7,12 @@
 void spike_deepclassifier(
     float *mem, const SPIKE_DEEPTECTOR_MEM_PARAMS deeptector_mem_params,
     const BAR_MEM_PARAMS bar_mem_params, const int outputs_offset,
-    const int *electrodes_offset, const int n_electrodes);
+    const int electrodes_addr_offset, const int n_electrodes);
 
-int get_n_samples(const int *electrodes_offset, const int idx);
+int get_n_samples(float *mem, const int electrodes_addr_offset, const int idx);
 
-void get_samples_offset(int *samples_offset, const int *electrodes_offset,
-                        const int n_samples, const int start_idx);
+void get_samples_offset(float *mem, int *samples_offset,
+                        const int electrodes_addr_offset, const int n_samples,
+                        const int start_idx);
 
 #endif

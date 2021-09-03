@@ -10,7 +10,8 @@ int main() {
   bool passed = true;
   string src_file = CPP_ROOT_PATH "tb_data/spike_deepclassifier.txt";
 
-  int mem_len = 2427234;
+  int mem_len = 2427330;
+  int electrodes_offset_len = 96;
   int spike_deeptector_params_len = 449587;
   int bar_params_len = 1923825;
   int input_len = 2880;
@@ -38,8 +39,12 @@ int main() {
   BAR_MEM_PARAMS bar_mem_params;
   int inputs_offset;
   int outputs_offset;
+  int electrodes_addr_offset;
 
-  sd_mem_params.params_offset = 0;
+  electrodes_addr_offset = 0;
+
+  sd_mem_params.params_offset =
+      electrodes_addr_offset + electrodes_offset_len * sizeof(float);
   bar_mem_params.params_offset =
       sd_mem_params.params_offset + spike_deeptector_params_len * sizeof(float);
   inputs_offset = bar_mem_params.params_offset + bar_params_len * sizeof(float);
@@ -53,14 +58,9 @@ int main() {
   outputs_offset = bar_mem_params.mem_1_offset + mem_1_len * sizeof(float);
 
   int n_electrodes = 2;
-  int electrodes_offset[n_electrodes];
-
-  electrodes_offset[0] = inputs_offset;
-  electrodes_offset[1] = inputs_offset + int(2 * 48 * 20 * sizeof(float));
-  electrodes_offset[2] = inputs_offset + int(3 * 48 * 20 * sizeof(float));
 
   spike_deepclassifier(mem, sd_mem_params, bar_mem_params, outputs_offset,
-                       electrodes_offset, n_electrodes);
+                       electrodes_addr_offset, n_electrodes);
 
   int error_count = 0;
   bool flag = false;
