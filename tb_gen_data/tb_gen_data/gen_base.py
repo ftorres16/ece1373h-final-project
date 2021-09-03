@@ -1,5 +1,4 @@
 import typing as T
-from array import array
 
 from tb_gen_data.config import OUTPUT_FOLDER
 
@@ -63,7 +62,7 @@ class GenBase:
         self._gen_mem_bin()
 
         with open(self.out_bin_file, "wb") as f:
-            self.mem_bin.tofile(f)
+            f.write(self.mem_bin)
 
     def _gen_mem_pre(self):
         """

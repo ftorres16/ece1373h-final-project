@@ -1,7 +1,7 @@
 import typing as T
-from array import array
 
 import torch
+import numpy as np
 
 
 class MemChunk:
@@ -12,6 +12,7 @@ class MemChunk:
         name: T.Optional[str] = None,
         pad_zeros: T.Optional[int] = None,
         masked: bool = False,
+        dtype: T.Optional[str] = None,
     ):
         """
         Create a memory chunk for the `Mem` object.
@@ -21,12 +22,14 @@ class MemChunk:
         - `name`: (optional)
         - `pad_zeros`: add zeros at the end
         - `masked`: if `True`, then this chunk may be outputted as only zeros
+        - `dtype`: data type for the output
         """
         self.data = data
         self.offset = offset
         self.name = name
         self.pad_zeros = pad_zeros
         self.masked = masked
+        self.dtype = dtype
 
         self.len = sum(torch.numel(t) for t in data)
         if pad_zeros is not None:
@@ -46,15 +49,20 @@ class MemChunk:
         if self.pad_zeros is not None:
             flat_data += [torch.zeros(self.pad_zeros)]
 
-        return [f"{x}\n" for tensor in flat_data for x in tensor.tolist()]
+        np_data = [tensor.detach().numpy() for tensor in flat_data]
 
-    def to_bin(self, pre: bool = False) -> array:
+        if self.dtype is not None:
+            np_data = [array.astype(self.dtype) for array in np_data]
+
+        return [f"{x}\n" for array in flat_data for x in array]
+
+    def to_bin(self, pre: bool = False) -> bytes:
         """
         Output a binary array with the values from the chunk.
 
         - `pre`: a flag to turn all data with `masked == True` into 0s.
         """
-        mem_bin = array("f")
+        mem_bin = b""
 
         flat_data = [torch.flatten(t) for t in self.data]
 
@@ -62,9 +70,13 @@ class MemChunk:
             flat_data = [torch.zeros_like(t) for t in flat_data]
 
         for t in flat_data:
-            mem_bin.fromlist(torch.flatten(t).tolist())
+            array = torch.flatten(t).detach().numpy()
+            if self.dtype is not None:
+                array = array.astype(self.dtype)
+
+            mem_bin += array.tobytes()
 
         if self.pad_zeros is not None:
-            mem_bin.fromlist([0.0] * self.pad_zeros)
+            mem_bin += np.zeros(self.pad_zeros, dtype=array.dtype).tobytes()
 
         return mem_bin
