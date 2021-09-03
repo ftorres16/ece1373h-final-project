@@ -114,9 +114,9 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         _ = mem.add_tensor_list_chunk(
             bar_labels, "bar_labels", pad_zeros=bar_pad_zeros, masked=True
         )
-        _ = mem.add_tensor_list_chunk(
-            self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
-        )
+        # _ = mem.add_tensor_list_chunk(
+        #     self.pca_outputs, "output", pad_zeros=pca_outputs_pad_zeros, masked=True
+        # )
 
         # update electrodes offset with actual memory addresses
         electrodes_offset[: n_inputs + 1] += (
