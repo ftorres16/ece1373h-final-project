@@ -107,9 +107,9 @@ void spike_deepclassifier(
     }
 #endif
 
-    // PCA decomposition, to be used by kNN for finishign the classifier
-    pca(mem, samples_offset[0],
-        pca_offset + n_prev_samples * SAMPLE_LEN * sizeof(float), n_samples);
+    // // PCA decomposition, to be used by kNN for finishign the classifier
+    // pca(mem, samples_offset[0],
+    //     pca_offset + n_prev_samples * SAMPLE_LEN * sizeof(float), n_samples);
 
     n_prev_samples += n_samples;
   }
