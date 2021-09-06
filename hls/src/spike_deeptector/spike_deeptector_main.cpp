@@ -7,7 +7,7 @@
 void spike_deeptector_main(float *mem,
                            const SPIKE_DEEPTECTOR_MEM_PARAMS mem_params,
                            const int n_electrodes,
-                           const int electrodes_addr_offset,
+                           const int electrodes_addr_offset[],
                            int *n_neural_channels, int *neural_channels) {
   // `pragmas` specified in directives.tcl so this layer can be used in
   // different projects
@@ -34,17 +34,16 @@ void spike_deeptector_main(float *mem,
   // iterate over the electrodes
   for (int i = 0; i < n_electrodes; i++) {
 
-    int n_batches = (mem[electrodes_addr_offset / sizeof(float) + i + 1] -
-                     mem[electrodes_addr_offset / sizeof(float) + i]) /
-                    (sizeof(float) * params.ix * params.iy);
+    int n_batches =
+        (electrodes_addr_offset[i + 1] - electrodes_addr_offset[i]) /
+        (sizeof(float) * params.ix * params.iy);
 
     for (int b_ = 0; b_ < n_batches; b_++) {
 
       // load inputs to `mem_0` for spike deeptector
       for (int j = 0; j < params.b * params.ix * params.iy; j++) {
-        int in_offset =
-            mem[electrodes_addr_offset / sizeof(float) + i] / sizeof(float) +
-            b_ * params.ix * params.iy;
+        int in_offset = electrodes_addr_offset[i] / sizeof(float) +
+                        b_ * params.ix * params.iy;
         int mem_0_offset = mem_params.mem_0_offset / sizeof(float);
 
         mem[mem_0_offset + j] = mem[in_offset + j];

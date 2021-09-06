@@ -39,12 +39,16 @@ int main() {
   BAR_MEM_PARAMS bar_mem_params;
   int inputs_offset;
   int outputs_offset;
-  int electrodes_addr_offset;
+  int electrodes_addr_offset[MAX_DEEPTECTOR_ELECTRODES];
 
-  electrodes_addr_offset = 0;
+  electrodes_addr_offset[0] = 9493648;
+  electrodes_addr_offset[1] = 9501328;
+  electrodes_addr_offset[2] = 9505168;
+  for (int i = 3; i < MAX_DEEPTECTOR_ELECTRODES; i++) {
+    electrodes_addr_offset[i] = 0;
+  }
 
-  sd_mem_params.params_offset =
-      electrodes_addr_offset + electrodes_offset_len * sizeof(float);
+  sd_mem_params.params_offset = 0;
   bar_mem_params.params_offset =
       sd_mem_params.params_offset + spike_deeptector_params_len * sizeof(float);
   inputs_offset = bar_mem_params.params_offset + bar_params_len * sizeof(float);
