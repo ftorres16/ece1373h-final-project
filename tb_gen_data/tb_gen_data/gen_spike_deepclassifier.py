@@ -102,7 +102,9 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
             )
 
         mem = Mem()
-        _ = mem.add_tensor_list_chunk([electrodes_offset], "electrodes_offset")
+        # _ = mem.add_tensor_list_chunk(
+        #     [electrodes_offset], "electrodes_offset", dtype="int32"
+        # )
         _ = mem.add_tensor_list_chunk(
             spike_deeptector_params, "spike_deeptector_params"
         )
@@ -122,6 +124,9 @@ class GenSpikeDeepClassifier(GenLoadWeightsBase):
         electrodes_offset[: n_inputs + 1] += (
             mem.chunks[input_idx].offset * FLOAT_SIZE_BYTES
         )
+
+        print("electrodes_offset: ")
+        print(electrodes_offset)
 
         self.mem_obj = mem
         self.mem = mem.to_text()
