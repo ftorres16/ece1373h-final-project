@@ -1,5 +1,7 @@
 # ece1373h-final-project
 
+This work is inspired by [SpikeDeepclassifier by Muhammad Saif-ur-Rehman et al.](https://iopscience.iop.org/article/10.1088/1741-2552/abc8d4) and serves as the course project for ECE1373 offered at the University of Toronto.
+
 ## Setup
 
 > :warning: Disclaimer: Scripts are mean to be run with Vivado Suite version 2019.1, use other versions at your own risk.
